@@ -79,6 +79,9 @@ IDWriteTextFormat* pTextFormat = NULL;
 int sysScreenX = GetSystemMetrics(SM_CXSCREEN);
 int sysScreenY = GetSystemMetrics(SM_CYSCREEN);
 
+double scalerX = sysScreenX / 398;
+double scalerY = sysScreenY / 224;
+
 // Total number of frames
 unsigned long long int frameCount = 0;
 
@@ -1354,7 +1357,6 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         // Draw background bitmap
         if (background)
         {
-            D2D1_SIZE_F size = background->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(0, 0,
                 sysScreenX, sysScreenY);
             pRenderTarget->DrawBitmap(background, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
@@ -1372,7 +1374,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             {
                 D2D1_SIZE_F size = enemyFrameBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(enemies.at(i).xPosition, enemies.at(i).yPosition,
-                    size.width + enemies.at(i).xPosition, size.height + enemies.at(i).yPosition);
+                    (size.width * scalerX / 10) + enemies.at(i).xPosition, (size.height * scalerY / 10) + enemies.at(i).yPosition);
                 pRenderTarget->DrawBitmap(enemyFrameBitmap, destRect);
             }
 
@@ -1409,7 +1411,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         {
             D2D1_SIZE_F size = playerFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.xPosition, player.yPosition,
-                size.width + player.xPosition, size.height + player.yPosition);
+                (size.width * scalerX / 10) + player.xPosition, (size.height * scalerY / 10) + player.yPosition);
             pRenderTarget->DrawBitmap(playerFrameBitmap, destRect);
         }
 
@@ -1435,7 +1437,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         {
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
-                size.width + player.weaponXPosition, size.height + player.weaponYPosition);
+                (size.width * scalerX / 10) + player.weaponXPosition, (size.height * scalerY / 10) + player.weaponYPosition);
             pRenderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect);
         }
 
@@ -1512,9 +1514,13 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             // Set up the source rectangle from the bitmap of the HP bar filling
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, hpBarWidth, size.height);
 
+            // Store variables for Bar width and height
+            double w = ((size.width) - 13) * scalerX;
+            double h = size.height * scalerX;
+
             // Set up the destination rectangle for the HP bar filling
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 10,
-                sysScreenX - (3 * size.width) - 13 + (3 * hpBarWidth), 10 + (3 * size.height));
+            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - w, 10 * scalerY,
+                sysScreenX - w + (scalerX * hpBarWidth), 10 + (h));
 
             pRenderTarget->DrawBitmap(playerHPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
