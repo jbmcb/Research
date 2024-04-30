@@ -13,7 +13,6 @@
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "dwrite.lib")
 
-
 // Contains all filenames necessary for the game to run. Condensed into variables to improve readability in later code.
 LPCWSTR playerStationaryDown = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Player\\playerstationarydown.png";
 LPCWSTR playerWalkingDownLeft = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Player\\playerwalkingdownleft.png";
@@ -43,47 +42,42 @@ LPCWSTR testSwordBasicAttackUp5 = L"C:\\Users\\receiving\\source\\repos\\Researc
 LPCWSTR testSwordBasicAttackUp6 = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Weapons\\testswordbasicattackup6.png";
 LPCWSTR testSwordBasicAttackUp7 = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Weapons\\testswordbasicattackup7.png";
 LPCWSTR playerHitBox = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Debug\\hitbox.png";
-
 LPCWSTR leafEnemyStationary = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Enemies\\LeafDownStationary.png";
 LPCWSTR leafEnemyDownWalkingLeft = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Enemies\\LeafDownWalkingLeft.png";
 LPCWSTR leafEnemyDownWalkingRight = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Enemies\\LeafDownWalkingRight.png";
 LPCWSTR leafEnemyDownHitstun = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Enemies\\LeafDownHitstun.png";
-
 LPCWSTR testBackground = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Environment\\testBackground.png";
-
 LPCWSTR hpBarShell = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\HPBar_Shell.png";
 LPCWSTR hpBarFilling = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\HPBar_Filling.png";
 LPCWSTR mpBarShell = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\MPBar_Shell.png";
 LPCWSTR mpBarFilling = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\MPBar_Filling.png";
 LPCWSTR expBarShell = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\EXPBar_Shell.png";
 LPCWSTR expBarFilling = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\EXPBar_Filling.png";
-
 LPCWSTR skillPanes = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\UI\\Skill Panes.png";
+LPCWSTR man = L"C:\\Users\\receiving\\source\\repos\\Research\\Research\\Sprites\\Enemies\\1.png";
 
-// ID2D1Factory interface is the starting point for using Direct2D; it's what you use to create other Direct2D resources
+// Interface: Starting point for Direct2D, used to create resources
 ID2D1Factory* pD2DFactory = NULL;
 
-// ID2D1HwndRenderTarget represents an object that can receive drawing commands.
+// Object: Receives drawing commands
 ID2D1HwndRenderTarget* pRenderTarget = NULL;
 
-// ID2D1Bitmap represents a bitmap that has been bound to an ID2D1RenderTarget
+// Map of Direct2D Bitmaps
 std::map<LPCWSTR, ID2D1Bitmap*> pBitmaps;
 
-// IDWriteFactory interface is the root factory interface for all DirectWrite objects, used for text
+// Interface: Used for directwrite text
 IDWriteFactory* pDWriteFactory = NULL;
 
-// IDWriteTextFormat interface describes the font and paragraph properties used to format text, and it describes locale information.
+// Interface: Used to specify font and paragraph format
 IDWriteTextFormat* pTextFormat = NULL;
 
-// System screen horizontal and vertical resolution
-int sysScreenX = GetSystemMetrics(SM_CXSCREEN);
-int sysScreenY = GetSystemMetrics(SM_CYSCREEN);
+// System screen horizontal and vertical resolution, makes specifying res less wordy
+const int sysScreenX = GetSystemMetrics(SM_CXSCREEN);
+const int sysScreenY = GetSystemMetrics(SM_CYSCREEN);
 
-double scalerX = sysScreenX / 398;
-double scalerY = sysScreenY / 224;
-
-// Total number of frames
-unsigned long long int frameCount = 0;
+// Multiplier to scale resolution with widescreen SNES resolution
+double scalerX = 1;
+double scalerY = 1;
 
 // Indexes the last time the fps was updated
 std::chrono::time_point<std::chrono::steady_clock> lastUpdate;
@@ -91,19 +85,17 @@ std::chrono::time_point<std::chrono::steady_clock> lastUpdate;
 // framerate
 double fps = 0.0;
 
-// ID2D1SolidColorBrush paints an area with a solid color.
+// Solid color paintbrush
 ID2D1SolidColorBrush* pBrush = NULL;
 
 // Index files
 std::vector<LPCWSTR> filePaths;
 
-// Use the steady_clock for timing to prevent issues with time changes
+// Attempting to use steady_clock to prevent issues with time changes
 std::chrono::steady_clock::time_point lastMoveTime = std::chrono::steady_clock::now();
 
-double moveInterval = 1 / 500; // Move every 0.002 seconds
 
-
-// contains booleans for key presses
+// Booleans for key presses
 struct
 {
     bool left = false;
@@ -121,6 +113,7 @@ void GetDirectionalInput(double& xDirection, double& yDirection, bool keyRight, 
     yDirection = (keyDown ? 1 : 0) - (keyUp ? 1 : 0);
 }
 
+// Essentially represents any generic entity that can have an appearance, move, be located somewhere, etc.
 class Object
 {
 public:
@@ -144,7 +137,7 @@ public:
     void WriteFileName(LPCWSTR file_Name)
     {
         fileName = file_Name;
-        fileNameChanged = true; // Flag that the filename has changed
+        fileNameChanged = true;
     }
 
     void DestroyObject()
@@ -154,6 +147,7 @@ public:
     }
 };
 
+// Objects but as enemies
 class Enemy : public Object
 {
 public:
@@ -171,13 +165,15 @@ public:
         xPosition = rand() % 1920;
         yPosition = rand() % 1080;
         fileName = leafEnemyStationary;
+        lastfilepath = leafEnemyStationary;
+        secondlastfilepath = leafEnemyDownWalkingRight;
         fileNameChanged = true;
         SetEnemyHurtBox();
     }
 
     void SetEnemyHurtBox()
     {
-        // Get the bitmap for the current object frame
+        // Get the bitmap for the currently loaded file
         ID2D1Bitmap* pBitmap = pBitmaps[fileName];
         if (pBitmap)
         {
@@ -188,7 +184,6 @@ public:
 
     }
 
-    // Displaces the Object
     void MoveEnemy(double xDirection, double yDirection)
     {
         xPosition += xDirection;
@@ -199,7 +194,6 @@ public:
         SetEnemyHurtBox();
     }
 
-    // Displaces the Object
     void DisplaceEnemy(double xDirection, double yDirection)
     {
         xPosition += xDirection;
@@ -211,12 +205,7 @@ public:
     {
         if (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - lastWalkTime) >= std::chrono::nanoseconds(166666666))
         {
-            if (lastfilepath == nullptr)
-            {
-                fileName = leafEnemyDownWalkingLeft;
-                lastfilepath = fileName;
-            }
-            else if (lastfilepath == leafEnemyDownWalkingLeft && secondlastfilepath == nullptr)
+            if (lastfilepath == leafEnemyDownWalkingLeft && secondlastfilepath == leafEnemyStationary)
             {
                 fileName = leafEnemyStationary;
                 lastfilepath = fileName;
@@ -239,12 +228,6 @@ public:
                 fileName = leafEnemyDownWalkingLeft;
                 lastfilepath = fileName;
                 secondlastfilepath = leafEnemyStationary;
-            }
-            else if (lastfilepath == leafEnemyDownWalkingLeft && secondlastfilepath == leafEnemyStationary)
-            {
-                fileName = leafEnemyStationary;
-                lastfilepath = fileName;
-                secondlastfilepath = leafEnemyDownWalkingLeft;
             }
             lastWalkTime = std::chrono::steady_clock::now();
             fileNameChanged = true;
@@ -523,13 +506,12 @@ public:
     }
 
     void PlayerWalkAnimation(double xDirection, double yDirection)
-    {
+    {   // An eyeful to read
         if (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - lastWalkTime) >= walkAnimationInterval
             || (yDirection == 0 && (((abs(xDirection) - abs(lastXDirection)) != 0)) || (xDirection == 0 && ((abs(yDirection) - abs(lastYDirection)) != 0)))
             || (yDirection == 0 && ((xDirection * lastXDirection) < 0) || (xDirection == 0 && (yDirection * lastYDirection) < 0)))
         {
-            // This section accounts for diagonal movement. The player should animate in the same direction they were facing before 
-            // they started moving diagonally
+            // Checks for Diagonal movement and changes logic accordingly
             if ((yDirection > 0 && xDirection != 0) && (lastfilepath == playerStationaryDown
                 || lastfilepath == playerWalkingDownLeft || lastfilepath == playerWalkingDownRight))
             {
@@ -551,7 +533,7 @@ public:
                 PlayerWalkingRightLogic(xDirection, yDirection);
             }
 
-            // If diagonal movement isn't detected, then animate in the direction the player is facing
+            // If no diagonal movement, just animate in direciton player's facing.
             else if (yDirection > 0)
             {
                 PlayerWalkingDownLogic(xDirection, yDirection);
@@ -569,15 +551,14 @@ public:
                 PlayerWalkingRightLogic(xDirection, yDirection);
             }
 
-            lastWalkTime = std::chrono::steady_clock::now(); // reset the frame counter
-            fileNameChanged = true; // Flag that the filename has changed
+            lastWalkTime = std::chrono::steady_clock::now();
+            fileNameChanged = true;
         }
     }
 
-    // Sets the hurtbox for the object. This is how the game knows if the player has been hit or is touching something.
+    // Sets the hurtbox for the player. This is how the game knows if the player has been hit or is touching something.
     void SetPlayerHurtBox()
     {
-        // Get the bitmap for the current object frame
         ID2D1Bitmap* pBitmap = pBitmaps[fileName];
         if (pBitmap)
         {
@@ -588,7 +569,7 @@ public:
 
     }
 
-    // Displaces the Object
+    // Displaces the Player
     void MovePlayer(double xDirection, double yDirection)
     {
         xPosition += xDirection;
@@ -788,7 +769,6 @@ public:
 
     void SetHitBox()
     {
-        // Get the bitmap for the current object frame
         ID2D1Bitmap* pBitmap = pBitmaps[weaponFileName];
         if (pBitmap)
         {
@@ -898,6 +878,7 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
     enemy.EnemyWalkAnimation();
 }
 
+// Images must be loaded into a container before images can be loaded and swapped onto the screen.
 void LoadSpriteData(std::vector<Object>& spriteData)
 {
     spriteData.reserve(40);
@@ -1081,25 +1062,23 @@ void LoadSpriteData(std::vector<Object>& spriteData)
 //            return;
 //        }
 //
-//        ID2D1Bitmap* pBitmap = NULL; // Create new bitmap for each file
+//        ID2D1Bitmap* pBitmap = NULL;
 //        hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, &pBitmap);
 //
 //        if (SUCCEEDED(hr))
 //        {
-//            pBitmaps[objects.fileName] = pBitmap; // Add the new bitmap to our bitmap map
-//            objects.fileNameChanged = false; // Reset the flag
+//            pBitmaps[objects.fileName] = pBitmap;
+//            objects.fileNameChanged = false; 
 //        }
 //
-//        // Release resources for each file
 //        pConverter->Release();
 //        pSource->Release();
 //        pDecoder->Release();
 //    }
 //
-//    // Release the WIC factory after processing all files
 //    pWICFactory->Release();
 //
-//    // Create DirectWrite factory and text format for rendering FPS counter
+//    // FPS counter
 //    hr = DWriteCreateFactory(
 //        DWRITE_FACTORY_TYPE_SHARED,
 //        __uuidof(IDWriteFactory),
@@ -1118,7 +1097,6 @@ void LoadSpriteData(std::vector<Object>& spriteData)
 //        );
 //    }
 //
-//    // Create the brush for text
 //    if (SUCCEEDED(hr)) {
 //        hr = pRenderTarget->CreateSolidColorBrush(
 //            D2D1::ColorF(D2D1::ColorF::White),
@@ -1154,7 +1132,7 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
         return;
     }
 
-    // Iterating over each file in the objects vector
+    // Iterating over each file in the sprite container
     for (int i = 0; i < spriteData.size(); i++)
     {
         if (spriteData.at(i).fileNameChanged || pBitmaps.find(spriteData.at(i).fileName) == pBitmaps.end())
@@ -1201,26 +1179,23 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
                 return;
             }
 
-            ID2D1Bitmap* pBitmap = NULL; // Create new bitmap for each file
+            ID2D1Bitmap* pBitmap = NULL;
             hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, &pBitmap);
 
             if (SUCCEEDED(hr))
             {
-                pBitmaps[spriteData.at(i).fileName] = pBitmap; // Add the new bitmap to our bitmap map
-                spriteData.at(i).fileNameChanged = false; // Reset the flag
+                pBitmaps[spriteData.at(i).fileName] = pBitmap; 
+                spriteData.at(i).fileNameChanged = false; 
             }
 
-            // Release resources for each file
             pConverter->Release();
             pSource->Release();
             pDecoder->Release();
         }
     }
 
-    // Release the WIC factory after processing all files
     pWICFactory->Release();
 
-    // Create DirectWrite factory and text format for rendering FPS counter
     hr = DWriteCreateFactory(
         DWRITE_FACTORY_TYPE_SHARED,
         __uuidof(IDWriteFactory),
@@ -1239,7 +1214,6 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
         );
     }
 
-    // Create the brush for text
     if (SUCCEEDED(hr)) {
         hr = pRenderTarget->CreateSolidColorBrush(
             D2D1::ColorF(D2D1::ColorF::White),
@@ -1250,7 +1224,6 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
 
 void DiscardDeviceResources()
 {
-    // Release brush
     if (pBrush)
     {
         pBrush->Release();
@@ -1294,10 +1267,8 @@ void DiscardDeviceResources()
 //    {
 //        pRenderTarget->BeginDraw();
 //
-//        // Get the bitmap for the current object from the map
 //        ID2D1Bitmap* pBitmap = pBitmaps[objects.fileName];
 //
-//        // Draw the bitmap
 //        if (pBitmap)
 //        {
 //            D2D1_SIZE_F size = pBitmap->GetSize();
@@ -1308,7 +1279,6 @@ void DiscardDeviceResources()
 //
 //        if (pTextFormat && pBrush)
 //        {
-//            // Compute FPS if a quarter of a second or more has passed since last update
 //            auto now = std::chrono::steady_clock::now();
 //            std::chrono::duration<double> elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdate);
 //            if (elapsed.count() >= 0.25) {
@@ -1351,10 +1321,10 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
 
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::DimGray));
 
-        // Get Bitmap for background
+        // Get bitmap for background
         ID2D1Bitmap* background = pBitmaps[testBackground];
 
-        // Draw background bitmap
+        // Render background
         if (background)
         {
             D2D1_RECT_F destRect = D2D1::RectF(0, 0,
@@ -1363,19 +1333,19 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
 
         }
 
-        // Get bitmap for and draw enemies
+        // Enemies
         for (int i = 0; i < enemies.size(); i++)
         {
-            // Get the bitmap for the current player frame from the map
+            // Get bitmap for enemies
             ID2D1Bitmap* enemyFrameBitmap = pBitmaps[enemies.at(i).fileName];
 
-            // Draw the Leaf enemy frame bitmap
+            // Render player
             if (enemyFrameBitmap)
             {
                 D2D1_SIZE_F size = enemyFrameBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(enemies.at(i).xPosition, enemies.at(i).yPosition,
-                    (size.width * scalerX / 10) + enemies.at(i).xPosition, (size.height * scalerY / 10) + enemies.at(i).yPosition);
-                pRenderTarget->DrawBitmap(enemyFrameBitmap, destRect);
+                    (size.width * scalerX) + enemies.at(i).xPosition, (size.height * scalerY) + enemies.at(i).yPosition);
+                pRenderTarget->DrawBitmap(enemyFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
 
             /*LPCWSTR file_Name;
@@ -1388,7 +1358,6 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
                 file_Name = playerHurtBox;
             }*/
 
-            //// Get the bitmap for the enemy hurtbox from the map
             //ID2D1Bitmap* enemyHurtBoxBitmap = pBitmaps[file_Name];
 
             //// Draw the hurtboxbitmap
@@ -1403,22 +1372,22 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             //}
         }
 
-        // Get the bitmap for the current player frame from the map
+        // Get the player bitmap
         ID2D1Bitmap* playerFrameBitmap = pBitmaps[player.fileName];
 
-        // Draw the player frame bitmap
+        // Render player
         if (playerFrameBitmap)
         {
             D2D1_SIZE_F size = playerFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.xPosition, player.yPosition,
-                (size.width * scalerX / 10) + player.xPosition, (size.height * scalerY / 10) + player.yPosition);
+                (size.width * scalerX) + player.xPosition, (size.height * scalerY) + player.yPosition);
             pRenderTarget->DrawBitmap(playerFrameBitmap, destRect);
         }
 
-        //// Get the bitmap for the player hurtbox from the map
+        //// Get hurtbox bitmap
         //ID2D1Bitmap* playerHurtBoxBitmap = pBitmaps[playerHurtBox];
 
-        //// Draw the hurtboxbitmap
+        //// Render hurtbox
         //if (playerHurtBoxBitmap)
         //{
         //    D2D1_SIZE_F size;
@@ -1429,21 +1398,21 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         //    pRenderTarget->DrawBitmap(playerHurtBoxBitmap, destRect);
         //}
 
-        // Get the bitmap for the current player weapon frame from the map
+        // Get weapon bitmap
         ID2D1Bitmap* playerWeaponFrameBitmap = pBitmaps[player.weaponFileName];
 
-        // Draw the player weapon frame
+        // Render weapon
         if (playerWeaponFrameBitmap)
         {
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
-                (size.width * scalerX / 10) + player.weaponXPosition, (size.height * scalerY / 10) + player.weaponYPosition);
+                (size.width * scalerX) + player.weaponXPosition, (size.height * scalerY) + player.weaponYPosition);
             pRenderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect);
         }
 
         HRESULT hr = S_OK;
 
-        // Create DirectWrite factory and text format for rendering HP & MP counter
+        // Text format for MP & HP
         hr = DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(IDWriteFactory),
@@ -1462,12 +1431,11 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             );
         }
 
-        // Align the text to the right
         if (SUCCEEDED(hr)) {
             hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
         }
 
-        // Create the brush for text
+        // Text color for MP & HP
         if (SUCCEEDED(hr)) {
             hr = pRenderTarget->CreateSolidColorBrush(
                 D2D1::ColorF(D2D1::ColorF::White),
@@ -1475,10 +1443,10 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             );
         }
 
-        // Get the bitmap for the player HP Bar Shell from the map
+        // Get HP Bar Shell Bitmap
         ID2D1Bitmap* playerHPBarShell = pBitmaps[hpBarShell];
 
-        // Draw the player HP Bar Shell
+        // Render HP Bar SHell
         if (playerHPBarShell)
         {
             D2D1_SIZE_F size = playerHPBarShell->GetSize();
@@ -1499,36 +1467,33 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             );
         }
 
-        // Get the bitmap for the player HP Bar Filling from the map
+        // Get HP Bar filling bitmap
         ID2D1Bitmap* playerHPBarFilling = pBitmaps[hpBarFilling];
 
-        // Draw the player HP Bar Filling
+        // Render HP Bar Filling
         if (playerHPBarFilling)
         {
             D2D1_SIZE_F size = playerHPBarFilling->GetSize();
 
-            // Calculate the width of the HP bar filling based on player's current HP
+            // Get ratio based on player's current HP
             double hpRatio = player.HP / player.maxHP;
             unsigned int hpBarWidth = size.width * hpRatio;
 
-            // Set up the source rectangle from the bitmap of the HP bar filling
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, hpBarWidth, size.height);
 
-            // Store variables for Bar width and height
-            double w = ((size.width) - 13) * scalerX;
-            double h = size.height * scalerX;
+            double w = ((size.width) - 13) * 3;
+            double h = size.height * 3;
 
-            // Set up the destination rectangle for the HP bar filling
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - w, 10 * scalerY,
-                sysScreenX - w + (scalerX * hpBarWidth), 10 + (h));
+            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 10,
+                sysScreenX - (3 * size.width) - 13 + (3 * hpBarWidth), 10 + h);
 
             pRenderTarget->DrawBitmap(playerHPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
 
-        // Get the bitmap for the player MP Bar Shell from the map
+        // Get MP Bar Shell Bitmap
         ID2D1Bitmap* playerMPBarShell = pBitmaps[mpBarShell];
 
-        // Draw the player MP Bar Shell
+        // Render MP Bar Shell
         if (playerMPBarShell)
         {
             D2D1_SIZE_F size = playerMPBarShell->GetSize();
@@ -1549,32 +1514,28 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             );
         }
 
-        // Get the bitmap for the player MP Bar Filling from the map
+        // Get MP Bar Filling bitmap
         ID2D1Bitmap* playerMPBarFilling = pBitmaps[mpBarFilling];
 
-        // Draw the player MP Bar Filling
+        // Render MP Bar Filling
         if (playerMPBarFilling)
         {
             D2D1_SIZE_F size = playerMPBarFilling->GetSize();
 
-            // Calculate the width of the MP bar filling based on player's current MP
             double mpRatio = player.MP / player.maxMP;
             unsigned int mpBarWidth = size.width * mpRatio;
 
-            // Set up the source rectangle from the bitmap of the MP bar filling
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, mpBarWidth, size.height);
 
-            // Set up the destination rectangle for the MP bar filling
             D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 10 + (3 * size.height),
                 sysScreenX - (3 * size.width) - 13 + (3 * mpBarWidth), 10 + (6 * size.height));
 
             pRenderTarget->DrawBitmap(playerMPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
 
-        // Get the bitmap for the player EXP Bar Shell from the map
+        // EXP Bar Shell
         ID2D1Bitmap* playerEXPBarShell = pBitmaps[expBarShell];
 
-        // Draw the player EXP Bar Shell
         if (playerEXPBarShell)
         {
             D2D1_SIZE_F size = playerEXPBarShell->GetSize();
@@ -1583,32 +1544,27 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             pRenderTarget->DrawBitmap(playerEXPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
-        // Get the bitmap for the player EXP Bar Filling from the map
+        // EXP Bar Filling
         ID2D1Bitmap* playerEXPBarFilling = pBitmaps[expBarFilling];
 
-        // Draw the player EXP Bar Filling
         if (playerEXPBarFilling)
         {
             D2D1_SIZE_F size = playerEXPBarFilling->GetSize();
 
-            // Calculate the width of the EXP bar filling based on player's current MP
             double expRatio = player.exp / player.levelup;
             unsigned int expBarWidth = size.width * expRatio;
 
-            // Set up the source rectangle from the bitmap of the EXP bar filling
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, expBarWidth, size.height);
 
-            // Set up the destination rectangle for the EXP bar filling
             D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 122,
                 sysScreenX - (3 * size.width) - 13 + (3 * expBarWidth), 134);
 
             pRenderTarget->DrawBitmap(playerEXPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
 
-        // Get the bitmap for the player Skill Panes from the map
+        // Skill Panes
         ID2D1Bitmap* playerSkillPanes = pBitmaps[skillPanes];
 
-        // Draw the player Skill Panes
         if (playerSkillPanes)
         {
             int offset = 20;
@@ -1617,7 +1573,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             pRenderTarget->DrawBitmap(playerSkillPanes, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
-        // Create DirectWrite factory and text format for rendering FPS counter
+        // FPS Counter
         hr = DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(IDWriteFactory),
@@ -1644,10 +1600,9 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             );
         }
 
-        //// Get the bitmap for the weapon hitbox from the map
+        //// Weapn Hitbox
         //ID2D1Bitmap* playerHitBoxBitmap = pBitmaps[playerHitBox];
 
-        //// Draw the weapon hitbox frame
         //if (playerHitBoxBitmap && playerWeaponFrameBitmap)
         //{
         //    D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
@@ -1658,7 +1613,6 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
 
         //if (pTextFormat && pBrush)
         //{
-        //    // Compute FPS if a quarter of a second or more has passed since last update
         //    auto now = std::chrono::steady_clock::now();
         //    std::chrono::duration<double> elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdate);
         //    if (elapsed.count() >= 0.25) {
@@ -1699,7 +1653,6 @@ std::vector<Enemy> enemies;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
-    /* initialize random seed: */
     srand(time(NULL));
 
     // Load all Sprites
@@ -1869,12 +1822,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         OnRender(hWnd, spriteData, player, enemies);
 
-        // Increment frame count for FPS computation
-        frameCount++;
-
         EndPaint(hWnd, &ps);
 
-        // Invalidate the window rectangle to cause WM_PAINT message to be generated
         InvalidateRect(hWnd, NULL, FALSE);
     } break;
 
