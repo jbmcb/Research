@@ -76,8 +76,11 @@ const int sysScreenX = GetSystemMetrics(SM_CXSCREEN);
 const int sysScreenY = GetSystemMetrics(SM_CYSCREEN);
 
 // Multiplier to scale resolution with widescreen SNES resolution
-double scalerX = 1;
-double scalerY = 1;
+double scalerX = static_cast<double>(sysScreenX) / 398.22222222222222222222;
+double scalerY = static_cast<double>(sysScreenY) / 224;
+
+double leftBorder = (sysScreenX / 2) - (128 * scalerX);
+double rightBorder = (sysScreenX / 2) + (128 * scalerX);
 
 // Indexes the last time the fps was updated
 std::chrono::time_point<std::chrono::steady_clock> lastUpdate;
@@ -178,8 +181,8 @@ public:
         if (pBitmap)
         {
             D2D1_SIZE_F size = pBitmap->GetSize();
-            hurtbox = D2D1::RectF(xPosition + 10, yPosition + 10,
-                size.width + xPosition - 20, size.height + yPosition);
+            hurtbox = D2D1::RectF(xPosition, yPosition,
+                (size.width * scalerX) + xPosition, (size.height * scalerY) + yPosition);
         }
 
     }
@@ -226,6 +229,12 @@ public:
             else if (lastfilepath == leafEnemyStationary && secondlastfilepath == leafEnemyDownWalkingRight)
             {
                 fileName = leafEnemyDownWalkingLeft;
+                lastfilepath = fileName;
+                secondlastfilepath = leafEnemyStationary;
+            }
+            else 
+            {
+                fileName = leafEnemyDownWalkingRight;
                 lastfilepath = fileName;
                 secondlastfilepath = leafEnemyStationary;
             }
@@ -563,8 +572,8 @@ public:
         if (pBitmap)
         {
             D2D1_SIZE_F size = pBitmap->GetSize();
-            hurtbox = D2D1::RectF(xPosition + 30, yPosition + 10,
-                size.width + xPosition - 30, size.height + yPosition - 15);
+            hurtbox = D2D1::RectF(xPosition, yPosition,
+                (size.width * scalerX) + xPosition, (size.height * scalerY) + yPosition);
         }
 
     }
@@ -593,23 +602,14 @@ public:
         if (lastfilepath == playerStationaryUp || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUp, testSwordBasicAttackUp1);
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition + ((size.width * 12 / 13) * scalerX);
+                weaponYPosition = yPosition + ((size.height * 11 / 21) * scalerY);
+            }
 
-            weaponXPosition = xPosition + 108;
-            weaponYPosition = yPosition + 99;
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            isBasicAttacking = true;
-            hitLag = std::chrono::nanoseconds(0);
-
-        }
-        else if (lastfilepath == playerStationaryUp || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight)
-        {
-            SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUp, testSwordBasicAttackUp1);
-
-            weaponXPosition = xPosition + 108;
-            weaponYPosition = yPosition + 99;
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -619,12 +619,17 @@ public:
 
         }
         else if (lastfilepath == playerStationaryUpBasicAttack1
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 10))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 125))
         {
             SwapAttackFrames(playerStationaryUpBasicAttack2, playerStationaryUpBasicAttack1, testSwordBasicAttackUp2);
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition + ((size.width * 12 / 13) * scalerX);
+                weaponYPosition = yPosition;
+            }
 
-            weaponXPosition = xPosition + 108;
-            weaponYPosition = yPosition;
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -636,8 +641,13 @@ public:
         {
             SwapAttackFrames(playerStationaryUpBasicAttack3, playerStationaryUpBasicAttack2, testSwordBasicAttackUp3);
 
-            weaponXPosition = xPosition + 99;
-            weaponYPosition = yPosition - 81;
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition + ((size.width * 11 / 13) * scalerX);
+                weaponYPosition = yPosition - ((size.height * 9 / 21) * scalerY);
+            }
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -649,8 +659,13 @@ public:
         {
             SwapAttackFrames(playerStationaryUpBasicAttack4, playerStationaryUpBasicAttack3, testSwordBasicAttackUp4);
 
-            weaponXPosition = xPosition + 45;
-            weaponYPosition = yPosition - 108;
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition + ((size.width * 5 / 13) * scalerX);
+                weaponYPosition = yPosition - ((size.height * 12 / 21) * scalerY);
+            }
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -662,8 +677,13 @@ public:
         {
             SwapAttackFrames(playerStationaryUpBasicAttack5, playerStationaryUpBasicAttack4, testSwordBasicAttackUp5);
 
-            weaponXPosition = xPosition - 54;
-            weaponYPosition = yPosition - 81;
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition - ((size.width * 6 / 13) * scalerX);
+                weaponYPosition = yPosition - ((size.height * 9 / 21) * scalerY);
+            }
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -675,8 +695,13 @@ public:
         {
             SwapAttackFrames(playerStationaryUpBasicAttack6, playerStationaryUpBasicAttack5, testSwordBasicAttackUp6);
 
-            weaponXPosition = xPosition - 135;
-            weaponYPosition = yPosition - 54;
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition - ((size.width * 15 / 13) * scalerX);
+                weaponYPosition = yPosition - ((size.height * 6 / 21) * scalerY);
+            }
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -688,8 +713,13 @@ public:
         {
             SwapAttackFrames(playerStationaryUpBasicAttack7, playerStationaryUpBasicAttack6, testSwordBasicAttackUp7);
 
-            weaponXPosition = xPosition - 162;
-            weaponYPosition = yPosition + 9;
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition - ((size.width * 18 / 13) * scalerX);
+                weaponYPosition = yPosition + ((size.height * 1 / 21) * scalerY);
+            }
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
@@ -697,8 +727,8 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack7
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements))
-            && keys.space == false)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 0))
+            /*&& keys.space == false*/)
         {
 
             fileName = playerStationaryUp;
@@ -774,7 +804,7 @@ public:
         {
             D2D1_SIZE_F size = pBitmap->GetSize();
             hitbox = D2D1::RectF(weaponXPosition, weaponYPosition,
-                size.width + weaponXPosition, size.height + weaponYPosition);
+                (size.width * scalerX) + weaponXPosition, (size.height * scalerY) + weaponYPosition);
         }
     }
 
@@ -797,12 +827,14 @@ public:
 
 void ApplyPlayerDirectionalInput(Player& player, std::chrono::duration<float> elapsedTime, std::chrono::steady_clock::time_point currentFrameTime, double xDir, double yDir)
 {
-    if ((xDir != 0 || yDir != 0) && player.hurtbox.left >= 0 && player.hurtbox.top >= 0
-        && player.hurtbox.right <= sysScreenX && player.hurtbox.bottom <= sysScreenY)
+    if ((xDir != 0 || yDir != 0) && player.hurtbox.left >= leftBorder && player.hurtbox.top >= 0
+        && player.hurtbox.right <= rightBorder && player.hurtbox.bottom <= sysScreenY)
     {
         player.MovePlayer(xDir, yDir);
-        if (player.hurtbox.left >= 0 && player.hurtbox.top >= 0
-            && player.hurtbox.right <= sysScreenX && player.hurtbox.bottom <= sysScreenY)
+        if ((player.hurtbox.left >= leftBorder && player.hurtbox.top >= 0
+            && player.hurtbox.right <= rightBorder && player.hurtbox.bottom <= sysScreenY) 
+            || ((player.hurtbox.left <= leftBorder || player.hurtbox.right >= rightBorder) && yDir != 0)
+            || ((player.hurtbox.top <= 0 || player.hurtbox.bottom >= sysScreenY) && xDir != 0))
         {
             player.PlayerWalkAnimation(3 * xDir, 3 * yDir);
         }
@@ -812,17 +844,17 @@ void ApplyPlayerDirectionalInput(Player& player, std::chrono::duration<float> el
         }
 
         // If the player was moved out of bounds, snaps them back in bounds
-        if (player.hurtbox.left <= 0)
+        if (player.hurtbox.left <= leftBorder)
         {
-            player.MovePlayer(0 - player.hurtbox.left, 0);
+            player.MovePlayer(round(.5 + leftBorder - player.hurtbox.left), 0);
         }
         if (player.hurtbox.top <= 0)
         {
             player.MovePlayer(0, 0 - player.hurtbox.top);
         }
-        if (player.hurtbox.right >= sysScreenX)
+        if (player.hurtbox.right >= rightBorder)
         {
-            player.MovePlayer(sysScreenX - player.hurtbox.right, 0);
+            player.MovePlayer(round(rightBorder - player.hurtbox.right - .5), 0);
         }
         if (player.hurtbox.bottom >= sysScreenY)
         {
@@ -843,9 +875,9 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
         enemy.MoveEnemy(xDir, yDir);
 
         // If the enemy was moved out of bounds, snaps them back in bounds
-        if (enemy.hurtbox.left <= 0)
+        if (enemy.hurtbox.left <= leftBorder)
         {
-            enemy.DisplaceEnemy(0 - enemy.hurtbox.left, 0);
+            enemy.DisplaceEnemy(leftBorder - enemy.hurtbox.left, 0);
             enemy.lastXDirection2 *= -1;
         }
         if (enemy.hurtbox.top <= 0)
@@ -853,9 +885,9 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
             enemy.DisplaceEnemy(0, 0 - enemy.hurtbox.top);
             enemy.lastYDirection2 *= -1;
         }
-        if (enemy.hurtbox.right >= sysScreenX)
+        if (enemy.hurtbox.right >= rightBorder)
         {
-            enemy.DisplaceEnemy(sysScreenX - enemy.hurtbox.right, 0);
+            enemy.DisplaceEnemy(rightBorder - enemy.hurtbox.right, 0);
             enemy.lastXDirection2 *= -1;
         }
         if (enemy.hurtbox.bottom >= sysScreenY)
@@ -1184,8 +1216,8 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
 
             if (SUCCEEDED(hr))
             {
-                pBitmaps[spriteData.at(i).fileName] = pBitmap; 
-                spriteData.at(i).fileNameChanged = false; 
+                pBitmaps[spriteData.at(i).fileName] = pBitmap;
+                spriteData.at(i).fileNameChanged = false;
             }
 
             pConverter->Release();
@@ -1308,7 +1340,7 @@ void DiscardDeviceResources()
 //    }
 //}
 
-void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vector<Enemy> enemies)
+void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vector<Enemy> enemies)
 {
     if (!pRenderTarget)
     {
@@ -1319,7 +1351,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
     {
         pRenderTarget->BeginDraw();
 
-        pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::DimGray));
+        pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
         // Get bitmap for background
         ID2D1Bitmap* background = pBitmaps[testBackground];
@@ -1327,8 +1359,8 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         // Render background
         if (background)
         {
-            D2D1_RECT_F destRect = D2D1::RectF(0, 0,
-                sysScreenX, sysScreenY);
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder, 0, rightBorder,
+                224 * scalerY);
             pRenderTarget->DrawBitmap(background, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
         }
@@ -1348,7 +1380,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
                 pRenderTarget->DrawBitmap(enemyFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
 
-            /*LPCWSTR file_Name;
+            LPCWSTR file_Name;
             if (enemies.at(i).damageTaken)
             {
                 file_Name = playerHitBox;
@@ -1356,7 +1388,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             else
             {
                 file_Name = playerHurtBox;
-            }*/
+            }
 
             //ID2D1Bitmap* enemyHurtBoxBitmap = pBitmaps[file_Name];
 
@@ -1381,7 +1413,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             D2D1_SIZE_F size = playerFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.xPosition, player.yPosition,
                 (size.width * scalerX) + player.xPosition, (size.height * scalerY) + player.yPosition);
-            pRenderTarget->DrawBitmap(playerFrameBitmap, destRect);
+            pRenderTarget->DrawBitmap(playerFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
         //// Get hurtbox bitmap
@@ -1407,7 +1439,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
                 (size.width * scalerX) + player.weaponXPosition, (size.height * scalerY) + player.weaponYPosition);
-            pRenderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect);
+            pRenderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
         HRESULT hr = S_OK;
@@ -1450,14 +1482,14 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         if (playerHPBarShell)
         {
             D2D1_SIZE_F size = playerHPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 10, 0 + 10,
-                sysScreenX - 10, 10 + (3 * size.height));
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 0 + 10,
+                rightBorder - 10, 10 + (3 * size.height));
             pRenderTarget->DrawBitmap(playerHPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
             // Draw HP total
             WCHAR buffer[128];
             swprintf_s(buffer, L"%.0f/%.0f", player.HP, player.maxHP);
-            D2D1_RECT_F layoutRect = D2D1::RectF(sysScreenX - (3 * size.width) - 200, 24, sysScreenX - (3 * size.width) - 15, size.height / 2 + 38);
+            D2D1_RECT_F layoutRect = D2D1::RectF(rightBorder - (3 * size.width) - 200, 24, rightBorder - (3 * size.width) - 15, size.height / 2 + 38);
             pRenderTarget->DrawText(
                 buffer,
                 wcslen(buffer),
@@ -1484,8 +1516,8 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
             double w = ((size.width) - 13) * 3;
             double h = size.height * 3;
 
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 10,
-                sysScreenX - (3 * size.width) - 13 + (3 * hpBarWidth), 10 + h);
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 10,
+                rightBorder - (3 * size.width) - 13 + (3 * hpBarWidth), 10 + h);
 
             pRenderTarget->DrawBitmap(playerHPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
@@ -1497,14 +1529,14 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         if (playerMPBarShell)
         {
             D2D1_SIZE_F size = playerMPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 10, 10 + (3 * size.height),
-                sysScreenX - 10, 10 + (6 * size.height));
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 10 + (3 * size.height),
+                rightBorder - 10, 10 + (6 * size.height));
             pRenderTarget->DrawBitmap(playerMPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
             // Draw MP total
             WCHAR buffer[128];
             swprintf_s(buffer, L"%.0f/%.0f", player.MP, player.maxMP);
-            D2D1_RECT_F layoutRect = D2D1::RectF(sysScreenX - (3 * size.width) - 200, 78, sysScreenX - (3 * size.width) - 15, size.height + 300);
+            D2D1_RECT_F layoutRect = D2D1::RectF(rightBorder - (3 * size.width) - 200, 78, rightBorder - (3 * size.width) - 15, size.height + 300);
             pRenderTarget->DrawText(
                 buffer,
                 wcslen(buffer),
@@ -1527,8 +1559,8 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, mpBarWidth, size.height);
 
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 10 + (3 * size.height),
-                sysScreenX - (3 * size.width) - 13 + (3 * mpBarWidth), 10 + (6 * size.height));
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 10 + (3 * size.height),
+                rightBorder - (3 * size.width) - 13 + (3 * mpBarWidth), 10 + (6 * size.height));
 
             pRenderTarget->DrawBitmap(playerMPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
@@ -1539,8 +1571,8 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         if (playerEXPBarShell)
         {
             D2D1_SIZE_F size = playerEXPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 10, 122,
-                sysScreenX - 10, 134);
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 122,
+                rightBorder - 10, 134);
             pRenderTarget->DrawBitmap(playerEXPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
@@ -1556,8 +1588,8 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, expBarWidth, size.height);
 
-            D2D1_RECT_F destRect = D2D1::RectF(sysScreenX - (3 * size.width) - 13, 122,
-                sysScreenX - (3 * size.width) - 13 + (3 * expBarWidth), 134);
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 122,
+                rightBorder - (3 * size.width) - 13 + (3 * expBarWidth), 134);
 
             pRenderTarget->DrawBitmap(playerEXPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
         }
@@ -1569,7 +1601,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         {
             int offset = 20;
             D2D1_SIZE_F size = playerSkillPanes->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(offset, offset, offset + 4 * size.width, offset + 4 * size.height);
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + offset, offset, offset + 4 * size.width, offset + 4 * size.height);
             pRenderTarget->DrawBitmap(playerSkillPanes, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
@@ -1607,7 +1639,7 @@ void OnRender(HWND hWnd, std::vector<Object> spriteData, Player player, std::vec
         //{
         //    D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
         //    D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
-        //        size.width + player.weaponXPosition, size.height + player.weaponYPosition);
+        //        (size.width * scalerX) + player.weaponXPosition, (size.height * scalerY) + player.weaponYPosition);
         //    pRenderTarget->DrawBitmap(playerHitBoxBitmap, destRect);
         //}
 
@@ -1801,15 +1833,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
             if (keys.lShift == true)
             {
-                xDir *= 2;
-                yDir *= 2;
-                player.walkAnimationInterval = std::chrono::nanoseconds(124999999);
+                xDir *= 1.4; 
+                yDir *= 1.4;
+                player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
             }
             else
             {
-                player.walkAnimationInterval = std::chrono::nanoseconds(166666666);
+                player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
             }
-            ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, 3 * xDir, 3 * yDir);
+            ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, 1.5 * xDir, 1.5 * yDir);
         }
 
         else if (keys.space == true || player.isBasicAttacking == true)
@@ -1820,7 +1852,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
 
-        OnRender(hWnd, spriteData, player, enemies);
+        Render(hWnd, spriteData, player, enemies);
 
         EndPaint(hWnd, &ps);
 
