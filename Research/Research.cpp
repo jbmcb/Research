@@ -27,6 +27,7 @@ LPCWSTR playerStationaryRight = L"Sprites\\Player\\playerstationaryright.png";
 LPCWSTR playerWalkingRightLeft = L"Sprites\\Player\\playerwalkingrightleft.png";
 LPCWSTR playerWalkingRightRight = L"Sprites\\Player\\playerwalkingrightright.png";
 LPCWSTR playerHurtBox = L"Sprites\\Debug\\hurtbox.png";
+LPCWSTR playerStationaryUpBasicAttack0 = L"Sprites\\Player\\playerstationaryupbasicattack0.png";
 LPCWSTR playerStationaryUpBasicAttack1 = L"Sprites\\Player\\playerstationaryupbasicattack1.png";
 LPCWSTR playerStationaryUpBasicAttack2 = L"Sprites\\Player\\playerstationaryupbasicattack2.png";
 LPCWSTR playerStationaryUpBasicAttack3 = L"Sprites\\Player\\playerstationaryupbasicattack3.png";
@@ -34,6 +35,8 @@ LPCWSTR playerStationaryUpBasicAttack4 = L"Sprites\\Player\\playerstationaryupba
 LPCWSTR playerStationaryUpBasicAttack5 = L"Sprites\\Player\\playerstationaryupbasicattack5.png";
 LPCWSTR playerStationaryUpBasicAttack6 = L"Sprites\\Player\\playerstationaryupbasicattack6.png";
 LPCWSTR playerStationaryUpBasicAttack7 = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
+LPCWSTR playerStationaryUpBasicAttack8 = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
+LPCWSTR testSwordBasicAttackUp0 = L"Sprites\\Weapons\\testswordbasicattackup0.png";
 LPCWSTR testSwordBasicAttackUp1 = L"Sprites\\Weapons\\testswordbasicattackup1.png";
 LPCWSTR testSwordBasicAttackUp2 = L"Sprites\\Weapons\\testswordbasicattackup2.png";
 LPCWSTR testSwordBasicAttackUp3 = L"Sprites\\Weapons\\testswordbasicattackup3.png";
@@ -41,6 +44,7 @@ LPCWSTR testSwordBasicAttackUp4 = L"Sprites\\Weapons\\testswordbasicattackup4.pn
 LPCWSTR testSwordBasicAttackUp5 = L"Sprites\\Weapons\\testswordbasicattackup5.png";
 LPCWSTR testSwordBasicAttackUp6 = L"Sprites\\Weapons\\testswordbasicattackup6.png";
 LPCWSTR testSwordBasicAttackUp7 = L"Sprites\\Weapons\\testswordbasicattackup7.png";
+LPCWSTR testSwordBasicAttackUp8 = L"Sprites\\Weapons\\testswordbasicattackup8.png";
 LPCWSTR playerHitBox = L"Sprites\\Debug\\hitbox.png";
 LPCWSTR leafEnemyStationary = L"Sprites\\Enemies\\LeafDownStationary.png";
 LPCWSTR leafEnemyDownWalkingLeft = L"Sprites\\Enemies\\LeafDownWalkingLeft.png";
@@ -601,7 +605,27 @@ public:
     {
         if (lastfilepath == playerStationaryUp || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight)
         {
-            SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUp, testSwordBasicAttackUp1);
+            SwapAttackFrames(playerStationaryUpBasicAttack0, playerStationaryUp, testSwordBasicAttackUp0);
+            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (pBitmap)
+            {
+                D2D1_SIZE_F size = pBitmap->GetSize();
+                weaponXPosition = xPosition + ((size.width * 10 / 13) * scalerX);
+                weaponYPosition = yPosition + ((size.height * 13 / 21) * scalerY);
+            }
+
+            SetHitBox();
+            SetPlayerHurtBox();
+            basicAttackFrameThresholds += 1;
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
+            isBasicAttacking = true;
+            hitLag = std::chrono::nanoseconds(0);
+
+        }
+        else if (lastfilepath == playerStationaryUpBasicAttack0
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 50))
+        {
+            SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUpBasicAttack0, testSwordBasicAttackUp1);
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
             if (pBitmap)
             {
@@ -614,12 +638,10 @@ public:
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
             lastBasicAttackFrame = std::chrono::steady_clock::now();
-            isBasicAttacking = true;
             hitLag = std::chrono::nanoseconds(0);
-
         }
         else if (lastfilepath == playerStationaryUpBasicAttack1
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 125))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 0))
         {
             SwapAttackFrames(playerStationaryUpBasicAttack2, playerStationaryUpBasicAttack1, testSwordBasicAttackUp2);
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -637,7 +659,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack2
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 10)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack3, playerStationaryUpBasicAttack2, testSwordBasicAttackUp3);
 
@@ -655,7 +677,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack3
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 10)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack4, playerStationaryUpBasicAttack3, testSwordBasicAttackUp4);
 
@@ -673,7 +695,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack4
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 10)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack5, playerStationaryUpBasicAttack4, testSwordBasicAttackUp5);
 
@@ -691,7 +713,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack5
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 10)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack6, playerStationaryUpBasicAttack5, testSwordBasicAttackUp6);
 
@@ -709,7 +731,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack6
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 3))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 0))
         {
             SwapAttackFrames(playerStationaryUpBasicAttack7, playerStationaryUpBasicAttack6, testSwordBasicAttackUp7);
 
@@ -727,8 +749,26 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack7
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 0))
-            /*&& keys.space == false*/)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 0))
+            {
+                SwapAttackFrames(playerStationaryUpBasicAttack8, playerStationaryUpBasicAttack7, testSwordBasicAttackUp8);
+
+                ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+                if (pBitmap)
+                {
+                    D2D1_SIZE_F size = pBitmap->GetSize();
+                    weaponXPosition = xPosition - ((size.width * 13 / 13) * scalerX);
+                    weaponYPosition = yPosition + ((size.height * 13 / 21) * scalerY);
+                }
+                SetHitBox();
+                SetPlayerHurtBox();
+                basicAttackFrameThresholds += 1;
+                lastBasicAttackFrame = std::chrono::steady_clock::now();
+                hitLag = std::chrono::nanoseconds(0);
+                }
+        else if (lastfilepath == playerStationaryUpBasicAttack8
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 300))
+            && keys.space == false)
         {
 
             fileName = playerStationaryUp;
@@ -911,6 +951,7 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
 }
 
 // Images must be loaded into a container before images can be loaded and swapped onto the screen.
+// I don't yet know why, but sprites will not appear on screen unless this is used
 void LoadSpriteData(std::vector<Object>& spriteData)
 {
     spriteData.reserve(40);
@@ -1019,9 +1060,23 @@ void LoadSpriteData(std::vector<Object>& spriteData)
     spriteData.emplace_back();
     spriteData.at(38).WriteFileName(expBarFilling);
 
+    spriteData.emplace_back();
+    spriteData.at(39).WriteFileName(playerStationaryUpBasicAttack0);
+
+    spriteData.emplace_back();
+    spriteData.at(40).WriteFileName(testSwordBasicAttackUp0);
+
+    spriteData.emplace_back();
+    spriteData.at(41).WriteFileName(playerStationaryUpBasicAttack8);
+
+    spriteData.emplace_back();
+    spriteData.at(42).WriteFileName(testSwordBasicAttackUp8);
+
     // Skill Panes
     spriteData.emplace_back();
-    spriteData.at(39).WriteFileName(skillPanes);
+    spriteData.at(43).WriteFileName(skillPanes);
+
+    
 }
 
 //void CreateDeviceResources(HWND hWnd, Object objects)
@@ -1831,6 +1886,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (keys.space == false && player.isBasicAttacking == false)
         {
             GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
+            xDir *= 2;
+            yDir *= 2;
             if (keys.lShift == true)
             {
                 xDir *= 1.4; 
@@ -1841,7 +1898,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
             }
-            ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, 1.5 * xDir, 1.5 * yDir);
+            ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, xDir, yDir);
         }
 
         else if (keys.space == true || player.isBasicAttacking == true)
