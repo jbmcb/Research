@@ -36,6 +36,7 @@ LPCWSTR playerStationaryUpBasicAttack5 = L"Sprites\\Player\\playerstationaryupba
 LPCWSTR playerStationaryUpBasicAttack6 = L"Sprites\\Player\\playerstationaryupbasicattack6.png";
 LPCWSTR playerStationaryUpBasicAttack7 = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
 LPCWSTR playerStationaryUpBasicAttack8 = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
+LPCWSTR playerLevelUp = L"Sprites\\Player\\playerstationaryLevelUp.png";
 LPCWSTR testSwordBasicAttackUp0 = L"Sprites\\Weapons\\testswordbasicattackup0.png";
 LPCWSTR testSwordBasicAttackUp1 = L"Sprites\\Weapons\\testswordbasicattackup1.png";
 LPCWSTR testSwordBasicAttackUp2 = L"Sprites\\Weapons\\testswordbasicattackup2.png";
@@ -59,6 +60,7 @@ LPCWSTR expBarShell = L"Sprites\\UI\\EXPBar_Shell.png";
 LPCWSTR expBarFilling = L"Sprites\\UI\\EXPBar_Filling.png";
 LPCWSTR skillPanes = L"Sprites\\UI\\Skill Panes.png";
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
+
 
 // Interface: Starting point for Direct2D, used to create resources
 ID2D1Factory* pD2DFactory = NULL;
@@ -276,7 +278,7 @@ public:
     int defense = 5;
     int magicDefense = 3;
     int trueDefense = 1;
-    int speed = 10;
+    int agility = 10;
     int luck = 8;
 
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
@@ -851,6 +853,10 @@ public:
     void RemoveHitBox()
     {
         hitbox.right = hitbox.left = hitbox.top = hitbox.bottom = -1;
+    }
+
+    void PlayerLevelUpSequence() {
+
     }
 
 };
@@ -1904,6 +1910,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         else if (keys.space == true || player.isBasicAttacking == true)
         {
             player.BasicAttack(enemies);
+        }
+
+        if (player.exp >= player.levelup) {
+
         }
 
         PAINTSTRUCT ps;
