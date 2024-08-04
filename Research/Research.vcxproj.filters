@@ -45,5 +45,206 @@
     <Image Include="Research.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Sprites\Debug\hitbox.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Debug\hurtbox.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownHitstun.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownRollAttack6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownStationary.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownWalkingLeft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Enemies\LeafDownWalkingRight.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Environment\testBackground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerLevelUp.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerLevelUp1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerLevelUp2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationarydown.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryleft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryright.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryup.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerstationaryupbasicattack8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingdownleft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingdownright.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingleftleft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingleftright.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingrightleft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingrightright.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingupleft.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Player\playerwalkingupright.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\EXPBar_Filling.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\EXPBar_Shell.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Focused_Level_Up_Screen.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\HP_MP_EXP_ShellPrototype.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\HPBar_Filling.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\HPBar_Shell.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Back_Button_Pressed.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Back_Button_Unpressed.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Confirm_Button_Pressed.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Confirm_Button_Unpressed.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\MPBar_Filling.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\MPBar_Shell.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\Dinosaur Portrait.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\emotions enemy.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\Gooby.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\gurby.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\Gurby2.1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Undetermined\pixil-frame-0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\Weapons\testswordbasicattackup8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\leafdownwalkingleftlarge.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\leafstationarydownlarge.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\leafwalkingdownrightlarge.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
