@@ -838,7 +838,7 @@ public:
 
                         if (enemies.at(i).hp <= 0)
                         {
-                            exp += 100;
+                            exp += 10;
                             enemies.erase(enemies.begin() + i);
                         }
                         else
@@ -986,135 +986,96 @@ void LoadSpriteData(std::vector<Object>& spriteData)
 {
     spriteData.reserve(45);
 
+    auto addSprite = [&](const LPCWSTR& fileName) {
+        spriteData.emplace_back();
+        spriteData.back().WriteFileName(fileName);
+    };
+
+    //---------------- Player Sprites -----------------//
+    
     //down stand and move
-    spriteData.emplace_back();
-    spriteData.at(0).WriteFileName(playerStationaryDown);
-    spriteData.emplace_back();
-    spriteData.at(1).WriteFileName(playerWalkingDownLeft);
-    spriteData.emplace_back();
-    spriteData.at(2).WriteFileName(playerWalkingDownRight);
+    addSprite(playerStationaryDown);
+    addSprite(playerWalkingDownLeft);
+    addSprite(playerWalkingDownRight);
 
     // up stand and move
-    spriteData.emplace_back();
-    spriteData.at(3).WriteFileName(playerStationaryUp);
-    spriteData.emplace_back();
-    spriteData.at(4).WriteFileName(playerWalkingUpLeft);
-    spriteData.emplace_back();
-    spriteData.at(5).WriteFileName(playerWalkingUpRight);
+    addSprite(playerStationaryUp);
+    addSprite(playerWalkingUpLeft);
+    addSprite(playerWalkingUpRight);
 
     // left stand and mnove
-    spriteData.emplace_back();
-    spriteData.at(6).WriteFileName(playerStationaryLeft);
-    spriteData.emplace_back();
-    spriteData.at(7).WriteFileName(playerWalkingLeftLeft);
-    spriteData.emplace_back();
-    spriteData.at(8).WriteFileName(playerWalkingLeftRight);
+    addSprite(playerStationaryLeft);
+    addSprite(playerWalkingLeftLeft);
+    addSprite(playerWalkingLeftRight);
 
     // right stand and move
-    spriteData.emplace_back();
-    spriteData.at(9).WriteFileName(playerStationaryRight);
-    spriteData.emplace_back();
-    spriteData.at(10).WriteFileName(playerWalkingRightLeft);
-    spriteData.emplace_back();
-    spriteData.at(11).WriteFileName(playerWalkingRightRight);
+    addSprite(playerStationaryRight);
+    addSprite(playerWalkingRightLeft);
+    addSprite(playerWalkingRightRight);
 
     // player hurtbox
-    spriteData.emplace_back();
-    spriteData.at(12).WriteFileName(playerHurtBox);
+    addSprite(playerHurtBox);
 
     // player basic attack animation
-    spriteData.emplace_back();
-    spriteData.at(13).WriteFileName(playerStationaryUpBasicAttack1);
-    spriteData.emplace_back();
-    spriteData.at(14).WriteFileName(playerStationaryUpBasicAttack2);
-    spriteData.emplace_back();
-    spriteData.at(15).WriteFileName(playerStationaryUpBasicAttack3);
-    spriteData.emplace_back();
-    spriteData.at(16).WriteFileName(playerStationaryUpBasicAttack4);
-    spriteData.emplace_back();
-    spriteData.at(17).WriteFileName(playerStationaryUpBasicAttack5);
-    spriteData.emplace_back();
-    spriteData.at(18).WriteFileName(playerStationaryUpBasicAttack6);
-    spriteData.emplace_back();
-    spriteData.at(19).WriteFileName(playerStationaryUpBasicAttack7);
+    addSprite(playerStationaryUpBasicAttack0);
+    addSprite(playerStationaryUpBasicAttack1);
+    addSprite(playerStationaryUpBasicAttack2);
+    addSprite(playerStationaryUpBasicAttack3);
+    addSprite(playerStationaryUpBasicAttack4);
+    addSprite(playerStationaryUpBasicAttack5);
+    addSprite(playerStationaryUpBasicAttack6);
+    addSprite(playerStationaryUpBasicAttack7);
+    addSprite(playerStationaryUpBasicAttack8);
 
     // player weapon animations
-    spriteData.emplace_back();
-    spriteData.at(20).WriteFileName(testSwordBasicAttackUp1);
-    spriteData.emplace_back();
-    spriteData.at(21).WriteFileName(testSwordBasicAttackUp2);
-    spriteData.emplace_back();
-    spriteData.at(22).WriteFileName(testSwordBasicAttackUp3);
-    spriteData.emplace_back();
-    spriteData.at(23).WriteFileName(testSwordBasicAttackUp4);
-    spriteData.emplace_back();
-    spriteData.at(24).WriteFileName(testSwordBasicAttackUp5);
-    spriteData.emplace_back();
-    spriteData.at(25).WriteFileName(testSwordBasicAttackUp6);
-    spriteData.emplace_back();
-    spriteData.at(26).WriteFileName(testSwordBasicAttackUp7);
+    addSprite(testSwordBasicAttackUp0);
+    addSprite(testSwordBasicAttackUp1);
+    addSprite(testSwordBasicAttackUp2);
+    addSprite(testSwordBasicAttackUp3);
+    addSprite(testSwordBasicAttackUp4);
+    addSprite(testSwordBasicAttackUp5);
+    addSprite(testSwordBasicAttackUp6);
+    addSprite(testSwordBasicAttackUp7);
+    addSprite(testSwordBasicAttackUp8);
 
-    // player hitbox
-    spriteData.emplace_back();
-    spriteData.at(27).WriteFileName(playerHitBox);
-
-    // Leaf Enemy
-    spriteData.emplace_back();
-    spriteData.at(28).WriteFileName(leafEnemyStationary);
-    spriteData.emplace_back();
-    spriteData.at(29).WriteFileName(leafEnemyDownWalkingLeft);
-    spriteData.emplace_back();
-    spriteData.at(30).WriteFileName(leafEnemyDownWalkingRight);
-    spriteData.emplace_back();
-    spriteData.at(31).WriteFileName(leafEnemyDownHitstun);
-
-    // Background
-    spriteData.emplace_back();
-    spriteData.at(32).WriteFileName(testBackground);
-
-    // HP Bar
-    spriteData.emplace_back();
-    spriteData.at(33).WriteFileName(hpBarShell);
-    spriteData.emplace_back();
-    spriteData.at(34).WriteFileName(hpBarFilling);
-
-    // MP Bar
-    spriteData.emplace_back();
-    spriteData.at(35).WriteFileName(mpBarShell);
-    spriteData.emplace_back();
-    spriteData.at(36).WriteFileName(mpBarFilling);
-
-    // MP Bar
-    spriteData.emplace_back();
-    spriteData.at(37).WriteFileName(expBarShell);
-    spriteData.emplace_back();
-    spriteData.at(38).WriteFileName(expBarFilling);
-
-    spriteData.emplace_back();
-    spriteData.at(39).WriteFileName(playerStationaryUpBasicAttack0);
-
-    spriteData.emplace_back();
-    spriteData.at(40).WriteFileName(testSwordBasicAttackUp0);
-
-    spriteData.emplace_back();
-    spriteData.at(41).WriteFileName(playerStationaryUpBasicAttack8);
-
-    spriteData.emplace_back();
-    spriteData.at(42).WriteFileName(testSwordBasicAttackUp8);
-
-    // Skill Panes
-    /*spriteData.emplace_back();
-    spriteData.at(43).WriteFileName(skillPanes);*/
-
-    // Level Up
-    spriteData.emplace_back();
-    spriteData.at(43).WriteFileName(FocusedLevelUpScreen);
-
-    // Player Level Up Animation
-    spriteData.emplace_back();
-    spriteData.at(44).WriteFileName(playerLevelUp);
+    // Player level up pose
+    addSprite(playerLevelUp);
 
     
+    //---------------- Enemies -----------------//
+
+    // Leaf Enemy
+    addSprite(leafEnemyStationary);
+    addSprite(leafEnemyDownWalkingLeft);
+    addSprite(leafEnemyDownWalkingRight);
+    addSprite(leafEnemyDownHitstun);
+
+
+    //---------------- UI -----------------//
+
+    // player hitbox
+    addSprite(playerHitBox);
+
+    // HP Bar
+    addSprite(hpBarShell);
+    addSprite(hpBarFilling);
+
+    // MP Bar
+    addSprite(mpBarShell);
+    addSprite(mpBarFilling);
+
+    // MP Bar
+    addSprite(expBarShell);
+    addSprite(expBarFilling);
+
+    // Level Up
+    addSprite(FocusedLevelUpScreen);
+
+
+    //---------------- Environment -----------------//
+
+    // Background
+    addSprite(testBackground); 
 }
 
 //void CreateDeviceResources(HWND hWnd, Object objects)
@@ -1677,6 +1638,9 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
             D2D1_SIZE_F size = playerEXPBarFilling->GetSize();
 
             double expRatio = player.exp / player.levelup;
+            if (expRatio > 1) {
+                expRatio = 1;
+            }
             unsigned int expBarWidth = size.width * expRatio;
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, expBarWidth, size.height);
@@ -1728,6 +1692,7 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
         if (player.inLevelUpSequence && player.inLevelUpFanfare == false) {
             // Get level up screen bitmap
             ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];
+            /*ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];*/
 
             // Render level up screen
             if (focusedLevelUpBitmap)
@@ -1737,6 +1702,8 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
                                                   ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
                 pRenderTarget->DrawBitmap(focusedLevelUpBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
+
+
         }
 
         //// Weapn Hitbox
