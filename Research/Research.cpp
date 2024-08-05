@@ -991,6 +991,8 @@ void LoadSpriteData(std::vector<Object>& spriteData)
         spriteData.back().WriteFileName(fileName);
     };
 
+
+
     //---------------- Player Sprites -----------------//
     
     //down stand and move
@@ -1041,6 +1043,7 @@ void LoadSpriteData(std::vector<Object>& spriteData)
     // Player level up pose
     addSprite(playerLevelUp);
 
+
     
     //---------------- Enemies -----------------//
 
@@ -1049,6 +1052,7 @@ void LoadSpriteData(std::vector<Object>& spriteData)
     addSprite(leafEnemyDownWalkingLeft);
     addSprite(leafEnemyDownWalkingRight);
     addSprite(leafEnemyDownHitstun);
+
 
 
     //---------------- UI -----------------//
@@ -1070,6 +1074,8 @@ void LoadSpriteData(std::vector<Object>& spriteData)
 
     // Level Up
     addSprite(FocusedLevelUpScreen);
+    addSprite(Focu)
+
 
 
     //---------------- Environment -----------------//
