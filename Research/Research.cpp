@@ -14,6 +14,8 @@
 #pragma comment(lib, "dwrite.lib")
 
 // Contains all filenames necessary for the game to run. Condensed into variables to improve readability in later code.
+
+// Player Sprites
 LPCWSTR playerStationaryDown = L"Sprites\\Player\\playerstationarydown.png";
 LPCWSTR playerWalkingDownLeft = L"Sprites\\Player\\playerwalkingdownleft.png";
 LPCWSTR playerWalkingDownRight = L"Sprites\\Player\\playerwalkingdownright.png";
@@ -36,7 +38,9 @@ LPCWSTR playerStationaryUpBasicAttack5 = L"Sprites\\Player\\playerstationaryupba
 LPCWSTR playerStationaryUpBasicAttack6 = L"Sprites\\Player\\playerstationaryupbasicattack6.png";
 LPCWSTR playerStationaryUpBasicAttack7 = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
 LPCWSTR playerStationaryUpBasicAttack8 = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
-LPCWSTR playerLevelUp = L"Sprites\\Player\\playerstationaryLevelUp.png";
+LPCWSTR playerLevelUp = L"Sprites\\Player\\playerLevelUp.png";
+
+// Weapon Sprites
 LPCWSTR testSwordBasicAttackUp0 = L"Sprites\\Weapons\\testswordbasicattackup0.png";
 LPCWSTR testSwordBasicAttackUp1 = L"Sprites\\Weapons\\testswordbasicattackup1.png";
 LPCWSTR testSwordBasicAttackUp2 = L"Sprites\\Weapons\\testswordbasicattackup2.png";
@@ -46,12 +50,20 @@ LPCWSTR testSwordBasicAttackUp5 = L"Sprites\\Weapons\\testswordbasicattackup5.pn
 LPCWSTR testSwordBasicAttackUp6 = L"Sprites\\Weapons\\testswordbasicattackup6.png";
 LPCWSTR testSwordBasicAttackUp7 = L"Sprites\\Weapons\\testswordbasicattackup7.png";
 LPCWSTR testSwordBasicAttackUp8 = L"Sprites\\Weapons\\testswordbasicattackup8.png";
+
+// Debug
 LPCWSTR playerHitBox = L"Sprites\\Debug\\hitbox.png";
+
+// Enemy Sprites
 LPCWSTR leafEnemyStationary = L"Sprites\\Enemies\\LeafDownStationary.png";
 LPCWSTR leafEnemyDownWalkingLeft = L"Sprites\\Enemies\\LeafDownWalkingLeft.png";
 LPCWSTR leafEnemyDownWalkingRight = L"Sprites\\Enemies\\LeafDownWalkingRight.png";
 LPCWSTR leafEnemyDownHitstun = L"Sprites\\Enemies\\LeafDownHitstun.png";
+
+// Environment
 LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
+
+// UI Sprites
 LPCWSTR hpBarShell = L"Sprites\\UI\\HPBar_Shell.png";
 LPCWSTR hpBarFilling = L"Sprites\\UI\\HPBar_Filling.png";
 LPCWSTR mpBarShell = L"Sprites\\UI\\MPBar_Shell.png";
@@ -59,7 +71,10 @@ LPCWSTR mpBarFilling = L"Sprites\\UI\\MPBar_Filling.png";
 LPCWSTR expBarShell = L"Sprites\\UI\\EXPBar_Shell.png";
 LPCWSTR expBarFilling = L"Sprites\\UI\\EXPBar_Filling.png";
 LPCWSTR skillPanes = L"Sprites\\UI\\Skill Panes.png";
+
+// Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
+LPCWSTR FocusedLevelUpScreen = L"Sprites\\UI\\Focused_Level_up_Screen.png";
 
 
 // Interface: Starting point for Direct2D, used to create resources
@@ -262,6 +277,10 @@ public:
 class Player : public Object
 {
 public:
+
+    bool inLevelUpSequence = false;
+    bool inLevelUpFanfare = false;
+    std::chrono::steady_clock::time_point levelUpFanfareBegin = std::chrono::steady_clock::now();
 
     int level = 1;
     double exp = 0;
@@ -819,7 +838,7 @@ public:
 
                         if (enemies.at(i).hp <= 0)
                         {
-                            exp += 10;
+                            exp += 100;
                             enemies.erase(enemies.begin() + i);
                         }
                         else
@@ -856,7 +875,12 @@ public:
     }
 
     void PlayerLevelUpSequence() {
-
+        inLevelUpSequence = true;
+        inLevelUpFanfare = true;
+        fileName = playerLevelUp;
+        weaponFileName = nullptr;
+        RemoveHitBox();
+        levelUpFanfareBegin = std::chrono::steady_clock::now();
     }
 
 };
@@ -960,7 +984,7 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
 // I don't yet know why, but sprites will not appear on screen unless this is used
 void LoadSpriteData(std::vector<Object>& spriteData)
 {
-    spriteData.reserve(40);
+    spriteData.reserve(45);
 
     //down stand and move
     spriteData.emplace_back();
@@ -1079,8 +1103,16 @@ void LoadSpriteData(std::vector<Object>& spriteData)
     spriteData.at(42).WriteFileName(testSwordBasicAttackUp8);
 
     // Skill Panes
+    /*spriteData.emplace_back();
+    spriteData.at(43).WriteFileName(skillPanes);*/
+
+    // Level Up
     spriteData.emplace_back();
-    spriteData.at(43).WriteFileName(skillPanes);
+    spriteData.at(43).WriteFileName(FocusedLevelUpScreen);
+
+    // Player Level Up Animation
+    spriteData.emplace_back();
+    spriteData.at(44).WriteFileName(playerLevelUp);
 
     
 }
@@ -1693,6 +1725,20 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
             );
         }
 
+        if (player.inLevelUpSequence && player.inLevelUpFanfare == false) {
+            // Get level up screen bitmap
+            ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];
+
+            // Render level up screen
+            if (focusedLevelUpBitmap)
+            {
+                D2D1_SIZE_F size = focusedLevelUpBitmap->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (64 * scalerX), 1 * scalerY,
+                                                  ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
+                pRenderTarget->DrawBitmap(focusedLevelUpBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+        }
+
         //// Weapn Hitbox
         //ID2D1Bitmap* playerHitBoxBitmap = pBitmaps[playerHitBox];
 
@@ -1872,48 +1918,59 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now();
         std::chrono::duration<float> elapsedTime = currentFrameTime - lastMoveTime;
 
-        for (int i = 0; i < enemies.size(); i++)
-        {
-            if (enemies.at(i).framesWalked2 % 288 == 0 && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+        if (player.inLevelUpSequence == false) {
+            // Enemy Movement and Animations
+            for (int i = 0; i < enemies.size(); i++)
             {
-                double leafXDir = ((rand() % 200)) - 100;
-                leafXDir /= 100;
-                double leafYDir = ((rand() % 200)) - 100;
-                leafYDir /= 100;
-                ApplyEnemyDirectionalInput(enemies.at(i), 2 * leafXDir, 2 * leafYDir);
+                if (enemies.at(i).framesWalked2 % 288 == 0 && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+                {
+                    double leafXDir = ((rand() % 200)) - 100;
+                    leafXDir /= 100;
+                    double leafYDir = ((rand() % 200)) - 100;
+                    leafYDir /= 100;
+                    ApplyEnemyDirectionalInput(enemies.at(i), 2 * leafXDir, 2 * leafYDir);
+                }
+                else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+                {
+                    ApplyEnemyDirectionalInput(enemies.at(i), enemies.at(i).lastXDirection2, enemies.at(i).lastYDirection2);
+                }
             }
-            else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+
+            // Player Actions, Movement, and Animations
+            double xDir, yDir;
+            if (keys.space == false && player.isBasicAttacking == false)
             {
-                ApplyEnemyDirectionalInput(enemies.at(i), enemies.at(i).lastXDirection2, enemies.at(i).lastYDirection2);
+                GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
+                xDir *= 2;
+                yDir *= 2;
+                if (keys.lShift == true)
+                {
+                    xDir *= 1.4;
+                    yDir *= 1.4;
+                    player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
+                }
+                else
+                {
+                    player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
+                }
+                ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, xDir, yDir);
+            }
+
+            else if (keys.space == true || player.isBasicAttacking == true)
+            {
+                player.BasicAttack(enemies);
+            }
+
+            if (player.exp >= player.levelup) {
+                player.PlayerLevelUpSequence();
             }
         }
-
-        double xDir, yDir;
-        if (keys.space == false && player.isBasicAttacking == false)
-        {
-            GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
-            xDir *= 2;
-            yDir *= 2;
-            if (keys.lShift == true)
-            {
-                xDir *= 1.4; 
-                yDir *= 1.4;
-                player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
+        else {
+            if (player.inLevelUpFanfare) {
+                if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
+                    player.inLevelUpFanfare = false;
+                }
             }
-            else
-            {
-                player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
-            }
-            ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, xDir, yDir);
-        }
-
-        else if (keys.space == true || player.isBasicAttacking == true)
-        {
-            player.BasicAttack(enemies);
-        }
-
-        if (player.exp >= player.levelup) {
-
         }
 
         PAINTSTRUCT ps;
