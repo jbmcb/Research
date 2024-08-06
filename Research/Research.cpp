@@ -8,10 +8,13 @@
 #include <limits>
 #include <time.h>
 #include <stdlib.h>
+#include <string>
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "windowscodecs.lib")
 #pragma comment(lib, "dwrite.lib")
+
+
 
 // Contains all filenames necessary for the game to run. Condensed into variables to improve readability in later code.
 
@@ -63,7 +66,7 @@ LPCWSTR leafEnemyDownHitstun = L"Sprites\\Enemies\\LeafDownHitstun.png";
 // Environment
 LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
 
-// UI Sprites
+// UI
 LPCWSTR hpBarShell = L"Sprites\\UI\\HPBar_Shell.png";
 LPCWSTR hpBarFilling = L"Sprites\\UI\\HPBar_Filling.png";
 LPCWSTR mpBarShell = L"Sprites\\UI\\MPBar_Shell.png";
@@ -71,10 +74,21 @@ LPCWSTR mpBarFilling = L"Sprites\\UI\\MPBar_Filling.png";
 LPCWSTR expBarShell = L"Sprites\\UI\\EXPBar_Shell.png";
 LPCWSTR expBarFilling = L"Sprites\\UI\\EXPBar_Filling.png";
 LPCWSTR skillPanes = L"Sprites\\UI\\Skill Panes.png";
+LPCWSTR Level_Up_Back_Button_Unpressed = L"Sprites\\UI\\Level_Up_Back_Button_Unpressed.png";
+LPCWSTR Level_Up_Back_Button_Pressed = L"Sprites\\UI\\Level_Up_Back_Button_Pressed.png";
+LPCWSTR Level_Up_Confirm_Button_Unpressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Unpressed.png";
+LPCWSTR Level_Up_Confirm_Button_Pressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Pressed.png";
 
 // Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
-LPCWSTR FocusedLevelUpScreen = L"Sprites\\UI\\Focused_Level_up_Screen.png";
+LPCWSTR FocusedLevelUpScreen = L"Sprites\\UI\\Focused_Level_up_Screen.png"; 
+
+// Maps of info regarding various enemies
+std::map<const std::string, int> experience;
+
+void populateEnemyExpList() {
+    experience["Leafnir"] = 10;
+}
 
 
 // Interface: Starting point for Direct2D, used to create resources
@@ -96,7 +110,7 @@ IDWriteTextFormat* pTextFormat = NULL;
 const int sysScreenX = GetSystemMetrics(SM_CXSCREEN);
 const int sysScreenY = GetSystemMetrics(SM_CYSCREEN);
 
-// Multiplier to scale resolution with widescreen SNES resolution
+// Multiplier to scale resolution with SNES resolution
 double scalerX = static_cast<double>(sysScreenX) / 398.22222222222222222222;
 double scalerY = static_cast<double>(sysScreenY) / 224;
 
@@ -119,6 +133,8 @@ std::vector<LPCWSTR> filePaths;
 std::chrono::steady_clock::time_point lastMoveTime = std::chrono::steady_clock::now();
 
 
+
+
 // Booleans for key presses
 struct
 {
@@ -131,13 +147,16 @@ struct
     bool escape = false;
 } keys;
 
+
+
+
 void GetDirectionalInput(double& xDirection, double& yDirection, bool keyRight, bool keyLeft, bool keyDown, bool keyUp)
 {
     xDirection = (keyRight ? 1 : 0) - (keyLeft ? 1 : 0);
     yDirection = (keyDown ? 1 : 0) - (keyUp ? 1 : 0);
 }
 
-// Essentially represents any generic entity that can have an appearance, move, be located somewhere, etc.
+// Essentially represents anything that can appear on screen
 class Object
 {
 public:
@@ -176,6 +195,7 @@ class Enemy : public Object
 {
 public:
 
+    std::string name;
     int hp = 10;
     int maxHP = 10;
     bool damageTaken = false;
@@ -982,106 +1002,100 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
 
 // Images must be loaded into a container before images can be loaded and swapped onto the screen.
 // I don't yet know why, but sprites will not appear on screen unless this is used
-void LoadSpriteData(std::vector<Object>& spriteData)
+void LoadSpriteData(std::vector<LPCWSTR>& spriteData)
 {
-    spriteData.reserve(45);
-
-    auto addSprite = [&](const LPCWSTR& fileName) {
-        spriteData.emplace_back();
-        spriteData.back().WriteFileName(fileName);
-    };
-
-
-
     //---------------- Player Sprites -----------------//
     
     //down stand and move
-    addSprite(playerStationaryDown);
-    addSprite(playerWalkingDownLeft);
-    addSprite(playerWalkingDownRight);
+    spriteData.emplace_back(playerStationaryDown);
+    spriteData.emplace_back(playerWalkingDownLeft);
+    spriteData.emplace_back(playerWalkingDownRight);
 
     // up stand and move
-    addSprite(playerStationaryUp);
-    addSprite(playerWalkingUpLeft);
-    addSprite(playerWalkingUpRight);
+    spriteData.emplace_back(playerStationaryUp);
+    spriteData.emplace_back(playerWalkingUpLeft);
+    spriteData.emplace_back(playerWalkingUpRight);
 
     // left stand and mnove
-    addSprite(playerStationaryLeft);
-    addSprite(playerWalkingLeftLeft);
-    addSprite(playerWalkingLeftRight);
+    spriteData.emplace_back(playerStationaryLeft);
+    spriteData.emplace_back(playerWalkingLeftLeft);
+    spriteData.emplace_back(playerWalkingLeftRight);
 
     // right stand and move
-    addSprite(playerStationaryRight);
-    addSprite(playerWalkingRightLeft);
-    addSprite(playerWalkingRightRight);
+    spriteData.emplace_back(playerStationaryRight);
+    spriteData.emplace_back(playerWalkingRightLeft);
+    spriteData.emplace_back(playerWalkingRightRight);
 
     // player hurtbox
-    addSprite(playerHurtBox);
+    spriteData.emplace_back(playerHurtBox);
 
     // player basic attack animation
-    addSprite(playerStationaryUpBasicAttack0);
-    addSprite(playerStationaryUpBasicAttack1);
-    addSprite(playerStationaryUpBasicAttack2);
-    addSprite(playerStationaryUpBasicAttack3);
-    addSprite(playerStationaryUpBasicAttack4);
-    addSprite(playerStationaryUpBasicAttack5);
-    addSprite(playerStationaryUpBasicAttack6);
-    addSprite(playerStationaryUpBasicAttack7);
-    addSprite(playerStationaryUpBasicAttack8);
+    spriteData.emplace_back(playerStationaryUpBasicAttack0);
+    spriteData.emplace_back(playerStationaryUpBasicAttack1);
+    spriteData.emplace_back(playerStationaryUpBasicAttack2);
+    spriteData.emplace_back(playerStationaryUpBasicAttack3);
+    spriteData.emplace_back(playerStationaryUpBasicAttack4);
+    spriteData.emplace_back(playerStationaryUpBasicAttack5);
+    spriteData.emplace_back(playerStationaryUpBasicAttack6);
+    spriteData.emplace_back(playerStationaryUpBasicAttack7);
+    spriteData.emplace_back(playerStationaryUpBasicAttack8);
 
     // player weapon animations
-    addSprite(testSwordBasicAttackUp0);
-    addSprite(testSwordBasicAttackUp1);
-    addSprite(testSwordBasicAttackUp2);
-    addSprite(testSwordBasicAttackUp3);
-    addSprite(testSwordBasicAttackUp4);
-    addSprite(testSwordBasicAttackUp5);
-    addSprite(testSwordBasicAttackUp6);
-    addSprite(testSwordBasicAttackUp7);
-    addSprite(testSwordBasicAttackUp8);
+    spriteData.emplace_back(testSwordBasicAttackUp0);
+    spriteData.emplace_back(testSwordBasicAttackUp1);
+    spriteData.emplace_back(testSwordBasicAttackUp2);
+    spriteData.emplace_back(testSwordBasicAttackUp3);
+    spriteData.emplace_back(testSwordBasicAttackUp4);
+    spriteData.emplace_back(testSwordBasicAttackUp5);
+    spriteData.emplace_back(testSwordBasicAttackUp6);
+    spriteData.emplace_back(testSwordBasicAttackUp7);
+    spriteData.emplace_back(testSwordBasicAttackUp8);
 
     // Player level up pose
-    addSprite(playerLevelUp);
+    spriteData.emplace_back(playerLevelUp);
 
 
     
     //---------------- Enemies -----------------//
 
     // Leaf Enemy
-    addSprite(leafEnemyStationary);
-    addSprite(leafEnemyDownWalkingLeft);
-    addSprite(leafEnemyDownWalkingRight);
-    addSprite(leafEnemyDownHitstun);
+    spriteData.emplace_back(leafEnemyStationary);
+    spriteData.emplace_back(leafEnemyDownWalkingLeft);
+    spriteData.emplace_back(leafEnemyDownWalkingRight);
+    spriteData.emplace_back(leafEnemyDownHitstun);
 
 
 
     //---------------- UI -----------------//
 
     // player hitbox
-    addSprite(playerHitBox);
+    spriteData.emplace_back(playerHitBox);
 
     // HP Bar
-    addSprite(hpBarShell);
-    addSprite(hpBarFilling);
+    spriteData.emplace_back(hpBarShell);
+    spriteData.emplace_back(hpBarFilling);
 
     // MP Bar
-    addSprite(mpBarShell);
-    addSprite(mpBarFilling);
+    spriteData.emplace_back(mpBarShell);
+    spriteData.emplace_back(mpBarFilling);
 
     // MP Bar
-    addSprite(expBarShell);
-    addSprite(expBarFilling);
+    spriteData.emplace_back(expBarShell);
+    spriteData.emplace_back(expBarFilling);
 
     // Level Up
-    addSprite(FocusedLevelUpScreen);
-    addSprite(Focu)
-
+    spriteData.emplace_back(FocusedLevelUpScreen);
+    spriteData.emplace_back(Level_Up_Back_Button_Pressed);
+    spriteData.emplace_back(Level_Up_Back_Button_Unpressed);
+    spriteData.emplace_back(Level_Up_Confirm_Button_Pressed);
+    spriteData.emplace_back(Level_Up_Confirm_Button_Unpressed);
+    
 
 
     //---------------- Environment -----------------//
 
     // Background
-    addSprite(testBackground); 
+    spriteData.emplace_back(testBackground); 
 }
 
 //void CreateDeviceResources(HWND hWnd, Object objects)
@@ -1197,7 +1211,7 @@ void LoadSpriteData(std::vector<Object>& spriteData)
 //    }
 //}
 
-void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
+void CreateDeviceResources(HWND hWnd, std::vector<LPCWSTR> spriteData)
 {
     HRESULT hr = S_OK;
 
@@ -1227,63 +1241,59 @@ void CreateDeviceResources(HWND hWnd, std::vector<Object> spriteData)
     // Iterating over each file in the sprite container
     for (int i = 0; i < spriteData.size(); i++)
     {
-        if (spriteData.at(i).fileNameChanged || pBitmaps.find(spriteData.at(i).fileName) == pBitmaps.end())
+        IWICBitmapDecoder* pDecoder = NULL;
+        hr = pWICFactory->CreateDecoderFromFilename(spriteData.at(i),
+            NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+
+        if (FAILED(hr))
         {
-            IWICBitmapDecoder* pDecoder = NULL;
-            hr = pWICFactory->CreateDecoderFromFilename(spriteData.at(i).fileName,
-                NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder);
+            pWICFactory->Release();
+            return;
+        }
 
-            if (FAILED(hr))
-            {
-                pWICFactory->Release();
-                return;
-            }
+        IWICBitmapFrameDecode* pSource = NULL;
+        hr = pDecoder->GetFrame(0, &pSource);
 
-            IWICBitmapFrameDecode* pSource = NULL;
-            hr = pDecoder->GetFrame(0, &pSource);
+        if (FAILED(hr))
+        {
+            pDecoder->Release();
+            pWICFactory->Release();
+            return;
+        }
 
-            if (FAILED(hr))
-            {
-                pDecoder->Release();
-                pWICFactory->Release();
-                return;
-            }
+        IWICFormatConverter* pConverter = NULL;
+        hr = pWICFactory->CreateFormatConverter(&pConverter);
 
-            IWICFormatConverter* pConverter = NULL;
-            hr = pWICFactory->CreateFormatConverter(&pConverter);
+        if (FAILED(hr))
+        {
+            pSource->Release();
+            pDecoder->Release();
+            pWICFactory->Release();
+            return;
+        }
 
-            if (FAILED(hr))
-            {
-                pSource->Release();
-                pDecoder->Release();
-                pWICFactory->Release();
-                return;
-            }
+        hr = pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0, WICBitmapPaletteTypeMedianCut);
 
-            hr = pConverter->Initialize(pSource, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone, NULL, 0.0, WICBitmapPaletteTypeMedianCut);
-
-            if (FAILED(hr))
-            {
-                pConverter->Release();
-                pSource->Release();
-                pDecoder->Release();
-                pWICFactory->Release();
-                return;
-            }
-
-            ID2D1Bitmap* pBitmap = NULL;
-            hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, &pBitmap);
-
-            if (SUCCEEDED(hr))
-            {
-                pBitmaps[spriteData.at(i).fileName] = pBitmap;
-                spriteData.at(i).fileNameChanged = false;
-            }
-
+        if (FAILED(hr))
+        {
             pConverter->Release();
             pSource->Release();
             pDecoder->Release();
+            pWICFactory->Release();
+            return;
         }
+
+        ID2D1Bitmap* pBitmap = NULL;
+        hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter, NULL, &pBitmap);
+
+        if (SUCCEEDED(hr))
+        {
+            pBitmaps[spriteData.at(i)] = pBitmap;
+        }
+
+        pConverter->Release();
+        pSource->Release();
+        pDecoder->Release();
     }
 
     pWICFactory->Release();
@@ -1400,7 +1410,7 @@ void DiscardDeviceResources()
 //    }
 //}
 
-void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vector<Enemy> enemies)
+void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player player, std::vector<Enemy> enemies)
 {
     if (!pRenderTarget)
     {
@@ -1695,7 +1705,9 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
             );
         }
 
-        if (player.inLevelUpSequence && player.inLevelUpFanfare == false) {
+
+        // If the player has leveled up
+        if (player.inLevelUpSequence == true && player.inLevelUpFanfare == false) {
             // Get level up screen bitmap
             ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];
             /*ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];*/
@@ -1708,6 +1720,18 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
                                                   ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
                 pRenderTarget->DrawBitmap(focusedLevelUpBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
+
+
+            //// Get confirm bitmap
+            //ID2D1Bitmap* confirmButton = pBitmaps[Level_Up_Confirm_Button_Unpressed];
+            //// Render confirm button
+            //if (focusedLevelUpBitmap)
+            //{
+            //    D2D1_SIZE_F size = confirmButton->GetSize();
+            //    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (64 * scalerX), 1 * scalerY,
+            //        ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
+            //    pRenderTarget->DrawBitmap(confirmButton, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            //}
 
 
         }
@@ -1757,8 +1781,7 @@ void Render(HWND hWnd, std::vector<Object> spriteData, Player player, std::vecto
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-Object background;
-std::vector<Object> spriteData;
+std::vector<LPCWSTR> spriteData;
 Player player;
 Enemy leafEnemy[10];
 std::vector<Enemy> enemies;
@@ -1770,9 +1793,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     // Load all Sprites
     LoadSpriteData(spriteData);
 
-    std::vector<bool> calendar(365, false);
+    // Load Enemy Info
+    populateEnemyExpList();
 
-    int i = 0;
+    std::vector<bool> calendar(365, false);
 
     enemies.reserve(10);
     for (int i = 0; i < 10; i++)
