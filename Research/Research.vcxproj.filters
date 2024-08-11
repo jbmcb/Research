@@ -246,5 +246,26 @@
     <Image Include="Sprites\leafwalkingdownrightlarge.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

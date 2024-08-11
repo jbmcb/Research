@@ -191,6 +191,13 @@
     <Image Include="Sprites\UI\Level_Up_Back_Button_Unpressed.png" />
     <Image Include="Sprites\UI\Level_Up_Confirm_Button_Pressed.png" />
     <Image Include="Sprites\UI\Level_Up_Confirm_Button_Unpressed.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_1.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_2.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_3.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_4.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_5.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_6.png" />
+    <Image Include="Sprites\UI\Level_Up_Overworld_Text_7.png" />
     <Image Include="Sprites\UI\MPBar_Filling.png" />
     <Image Include="Sprites\UI\MPBar_Shell.png" />
     <Image Include="Sprites\Undetermined\Dinosaur Portrait.png" />

@@ -65,6 +65,7 @@ LPCWSTR leafEnemyDownHitstun = L"Sprites\\Enemies\\LeafDownHitstun.png";
 
 // Environment
 LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
+LPCWSTR checkerBackground = L"Sprites\\Environment\\checkerBackground.png";
 
 // UI
 LPCWSTR hpBarShell = L"Sprites\\UI\\HPBar_Shell.png";
@@ -78,6 +79,14 @@ LPCWSTR Level_Up_Back_Button_Unpressed = L"Sprites\\UI\\Level_Up_Back_Button_Unp
 LPCWSTR Level_Up_Back_Button_Pressed = L"Sprites\\UI\\Level_Up_Back_Button_Pressed.png";
 LPCWSTR Level_Up_Confirm_Button_Unpressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Unpressed.png";
 LPCWSTR Level_Up_Confirm_Button_Pressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Pressed.png";
+LPCWSTR Level_Up_Overworld_Text_1 = L"Sprites\\UI\\Level_Up_Overworld_Text_1.png";
+LPCWSTR Level_Up_Overworld_Text_2 = L"Sprites\\UI\\Level_Up_Overworld_Text_2.png";
+LPCWSTR Level_Up_Overworld_Text_3 = L"Sprites\\UI\\Level_Up_Overworld_Text_3.png";
+LPCWSTR Level_Up_Overworld_Text_4 = L"Sprites\\UI\\Level_Up_Overworld_Text_4.png";
+LPCWSTR Level_Up_Overworld_Text_5 = L"Sprites\\UI\\Level_Up_Overworld_Text_5.png";
+LPCWSTR Level_Up_Overworld_Text_6 = L"Sprites\\UI\\Level_Up_Overworld_Text_6.png";
+LPCWSTR Level_Up_Overworld_Text_7 = L"Sprites\\UI\\Level_Up_Overworld_Text_7.png";
+
 
 // Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
@@ -319,13 +328,17 @@ public:
     int trueDefense = 1;
     int agility = 10;
     int luck = 8;
-
+    
+    // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
     std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::nanoseconds(16666666 / 32);
     std::chrono::nanoseconds basicAttackStartLag = std::chrono::nanoseconds(66666666);
     std::chrono::nanoseconds basicAttackEndLag = std::chrono::nanoseconds(133333333);
     std::chrono::nanoseconds hitLag = std::chrono::nanoseconds(0);
-    std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666);
+    std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666); \
+    std::chrono::steady_clock::time_point lastLevelUpOverworldTextTime;
+
+    
     bool isBasicAttacking = false;
     LPCWSTR weaponFileName;
     double weaponXPosition = xPosition;
@@ -335,6 +348,8 @@ public:
     bool madeContact = false;
     bool frameAdvanced = false;
     LPCWSTR hpBarFileName;
+    LPCWSTR levelUpOverworldTextFileName = nullptr;
+    LPCWSTR lastLevelUpOverworldTextFileName = nullptr;
 
     Player()
     {
@@ -858,7 +873,7 @@ public:
 
                         if (enemies.at(i).hp <= 0)
                         {
-                            exp += 10;
+                            exp += 100;
                             enemies.erase(enemies.begin() + i);
                         }
                         else
@@ -899,6 +914,7 @@ public:
         inLevelUpFanfare = true;
         fileName = playerLevelUp;
         weaponFileName = nullptr;
+        yPosition -= 15 * scalerY;
         RemoveHitBox();
         levelUpFanfareBegin = std::chrono::steady_clock::now();
     }
@@ -917,7 +933,7 @@ public:
 
 void ApplyPlayerDirectionalInput(Player& player, std::chrono::duration<float> elapsedTime, std::chrono::steady_clock::time_point currentFrameTime, double xDir, double yDir)
 {
-    if ((xDir != 0 || yDir != 0) && player.hurtbox.left >= leftBorder && player.hurtbox.top >= 0
+    if ((xDir != 0 || yDir != 0) && (player.hurtbox.left + xDir) >= leftBorder && player.hurtbox.top >= 0
         && player.hurtbox.right <= rightBorder && player.hurtbox.bottom <= sysScreenY)
     {
         player.MovePlayer(xDir, yDir);
@@ -1002,7 +1018,7 @@ void ApplyEnemyDirectionalInput(Enemy& enemy, double xDir, double yDir)
 
 // Images must be loaded into a container before images can be loaded and swapped onto the screen.
 // I don't yet know why, but sprites will not appear on screen unless this is used
-void LoadSpriteData(std::vector<LPCWSTR>& spriteData)
+void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
 {
     //---------------- Player Sprites -----------------//
     
@@ -1089,13 +1105,20 @@ void LoadSpriteData(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Level_Up_Back_Button_Unpressed);
     spriteData.emplace_back(Level_Up_Confirm_Button_Pressed);
     spriteData.emplace_back(Level_Up_Confirm_Button_Unpressed);
-    
+    spriteData.emplace_back(Level_Up_Overworld_Text_1);
+    spriteData.emplace_back(Level_Up_Overworld_Text_2);
+    spriteData.emplace_back(Level_Up_Overworld_Text_3);
+    spriteData.emplace_back(Level_Up_Overworld_Text_4);
+    spriteData.emplace_back(Level_Up_Overworld_Text_5);
+    spriteData.emplace_back(Level_Up_Overworld_Text_6);
+    spriteData.emplace_back(Level_Up_Overworld_Text_7);
 
 
     //---------------- Environment -----------------//
 
     // Background
-    spriteData.emplace_back(testBackground); 
+    spriteData.emplace_back(testBackground);
+    spriteData.emplace_back(checkerBackground);
 }
 
 //void CreateDeviceResources(HWND hWnd, Object objects)
@@ -1410,7 +1433,7 @@ void DiscardDeviceResources()
 //    }
 //}
 
-void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player player, std::vector<Enemy> enemies)
+void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vector<Enemy> enemies)
 {
     if (!pRenderTarget)
     {
@@ -1424,7 +1447,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player player, std::vect
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
         // Get bitmap for background
-        ID2D1Bitmap* background = pBitmaps[testBackground];
+        ID2D1Bitmap* background = pBitmaps[checkerBackground];
 
         // Render background
         if (background)
@@ -1706,6 +1729,57 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player player, std::vect
         }
 
 
+        // If the player is in level up fanfare
+        if (player.inLevelUpSequence == true || player.inLevelUpFanfare == true) {
+
+            if (player.lastLevelUpOverworldTextFileName == nullptr) {
+                player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
+                player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
+            }
+            
+            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(100)) {
+                player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
+
+                if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_2;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_2) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_3;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_4;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_5;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_6;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } /*else {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                }*/
+            }
+ 
+
+            // Get level up overworld text bitmap
+            ID2D1Bitmap* level_Up_Overworld_Text = pBitmaps[player.levelUpOverworldTextFileName];
+            
+
+            // Render level up overworld text
+            if (level_Up_Overworld_Text)
+            {
+                D2D1_SIZE_F size = level_Up_Overworld_Text->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(player.xPosition - (12 * scalerX), player.yPosition,
+                    player.xPosition + ((size.width - 12) * scalerX), player.yPosition + (size.height * scalerY));
+                pRenderTarget->DrawBitmap(level_Up_Overworld_Text, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+        }
+
         // If the player has leveled up
         if (player.inLevelUpSequence == true && player.inLevelUpFanfare == false) {
             // Get level up screen bitmap
@@ -1791,7 +1865,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     srand(time(NULL));
 
     // Load all Sprites
-    LoadSpriteData(spriteData);
+    StoreSpriteFileNames(spriteData);
 
     // Load Enemy Info
     populateEnemyExpList();
