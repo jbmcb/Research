@@ -85,7 +85,6 @@ LPCWSTR Level_Up_Overworld_Text_3 = L"Sprites\\UI\\Level_Up_Overworld_Text_3.png
 LPCWSTR Level_Up_Overworld_Text_4 = L"Sprites\\UI\\Level_Up_Overworld_Text_4.png";
 LPCWSTR Level_Up_Overworld_Text_5 = L"Sprites\\UI\\Level_Up_Overworld_Text_5.png";
 LPCWSTR Level_Up_Overworld_Text_6 = L"Sprites\\UI\\Level_Up_Overworld_Text_6.png";
-LPCWSTR Level_Up_Overworld_Text_7 = L"Sprites\\UI\\Level_Up_Overworld_Text_7.png";
 
 
 // Misc
@@ -350,6 +349,9 @@ public:
     LPCWSTR hpBarFileName;
     LPCWSTR levelUpOverworldTextFileName = nullptr;
     LPCWSTR lastLevelUpOverworldTextFileName = nullptr;
+    int bobberUpper = 0;
+    int textBobbedUp = 0;
+    bool lastBobWasZero = true;
 
     Player()
     {
@@ -1108,10 +1110,9 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Level_Up_Overworld_Text_1);
     spriteData.emplace_back(Level_Up_Overworld_Text_2);
     spriteData.emplace_back(Level_Up_Overworld_Text_3);
-    spriteData.emplace_back(Level_Up_Overworld_Text_4);
-    spriteData.emplace_back(Level_Up_Overworld_Text_5);
-    spriteData.emplace_back(Level_Up_Overworld_Text_6);
-    spriteData.emplace_back(Level_Up_Overworld_Text_7);
+    //spriteData.emplace_back(Level_Up_Overworld_Text_4);
+    //spriteData.emplace_back(Level_Up_Overworld_Text_5);
+    //spriteData.emplace_back(Level_Up_Overworld_Text_6);
 
 
     //---------------- Environment -----------------//
@@ -1447,7 +1448,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
         // Get bitmap for background
-        ID2D1Bitmap* background = pBitmaps[checkerBackground];
+        ID2D1Bitmap* background = pBitmaps[testBackground];
 
         // Render background
         if (background)
@@ -1738,7 +1739,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
             }
             
-            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(100)) {
+            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(200)) {
                 player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
 
                 if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
@@ -1748,10 +1749,10 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_3;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
-                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_4;
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
-                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_5;
+                } /*else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_6;
@@ -1759,7 +1760,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                } /*else {
+                } else {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 }*/
@@ -1774,8 +1775,21 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             if (level_Up_Overworld_Text)
             {
                 D2D1_SIZE_F size = level_Up_Overworld_Text->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(player.xPosition - (12 * scalerX), player.yPosition,
-                    player.xPosition + ((size.width - 12) * scalerX), player.yPosition + (size.height * scalerY));
+
+                if (player.textBobbedUp > 20) {
+                    if (player.lastBobWasZero) {
+                        player.bobberUpper = 1;
+                        player.lastBobWasZero = false;
+                    }
+                    else {
+                        player.bobberUpper = 0;
+                        player.lastBobWasZero = true;
+                    }
+                    player.textBobbedUp = 0;
+                }
+                player.textBobbedUp++;
+                D2D1_RECT_F destRect = D2D1::RectF(player.xPosition - (14 * scalerX), player.yPosition + ((4 - player.bobberUpper) * scalerY),
+                    player.xPosition + ((size.width - 14) * scalerX), player.yPosition + ((size.height + 4 - player.bobberUpper) * scalerY));
                 pRenderTarget->DrawBitmap(level_Up_Overworld_Text, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
         }
