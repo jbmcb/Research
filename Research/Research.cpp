@@ -85,6 +85,10 @@ LPCWSTR Level_Up_Overworld_Text_3 = L"Sprites\\UI\\Level_Up_Overworld_Text_3.png
 LPCWSTR Level_Up_Overworld_Text_4 = L"Sprites\\UI\\Level_Up_Overworld_Text_4.png";
 LPCWSTR Level_Up_Overworld_Text_5 = L"Sprites\\UI\\Level_Up_Overworld_Text_5.png";
 LPCWSTR Level_Up_Overworld_Text_6 = L"Sprites\\UI\\Level_Up_Overworld_Text_6.png";
+LPCWSTR Level_Up_Overworld_Text_7 = L"Sprites\\UI\\Level_Up_Overworld_Text_7.png";
+LPCWSTR Level_Up_Overworld_Text_8 = L"Sprites\\UI\\Level_Up_Overworld_Text_8.png";
+LPCWSTR Level_Up_Overworld_Text_9 = L"Sprites\\UI\\Level_Up_Overworld_Text_9.png";
+
 
 
 // Misc
@@ -1110,9 +1114,12 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Level_Up_Overworld_Text_1);
     spriteData.emplace_back(Level_Up_Overworld_Text_2);
     spriteData.emplace_back(Level_Up_Overworld_Text_3);
-    //spriteData.emplace_back(Level_Up_Overworld_Text_4);
-    //spriteData.emplace_back(Level_Up_Overworld_Text_5);
-    //spriteData.emplace_back(Level_Up_Overworld_Text_6);
+    spriteData.emplace_back(Level_Up_Overworld_Text_4);
+    spriteData.emplace_back(Level_Up_Overworld_Text_5);
+    spriteData.emplace_back(Level_Up_Overworld_Text_6);
+    spriteData.emplace_back(Level_Up_Overworld_Text_7);
+    spriteData.emplace_back(Level_Up_Overworld_Text_8);
+    spriteData.emplace_back(Level_Up_Overworld_Text_9);
 
 
     //---------------- Environment -----------------//
@@ -1739,7 +1746,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
             }
             
-            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(200)) {
+            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(37)) {
                 player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
 
                 if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
@@ -1749,21 +1756,27 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_3;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
-                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_4;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                } /*else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
-                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_5;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_6;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_7;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_7) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_8;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_8) {
+                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_9;
+                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_9) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                } else {
-                    player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
-                    player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                }*/
+                }
             }
  
 
