@@ -354,7 +354,7 @@ public:
     LPCWSTR levelUpOverworldTextFileName = nullptr;
     LPCWSTR lastLevelUpOverworldTextFileName = nullptr;
     int bobberUpper = 0;
-    int textBobbedUp = 0;
+    std::chrono::steady_clock::time_point timePointofLastBob = std::chrono::steady_clock::now();
     bool lastBobWasZero = true;
 
     Player()
@@ -1743,10 +1743,10 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             if (player.lastLevelUpOverworldTextFileName == nullptr) {
                 player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                 player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
             }
             
             if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(37)) {
+
                 player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
 
                 if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
@@ -1778,7 +1778,6 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                 }
             }
- 
 
             // Get level up overworld text bitmap
             ID2D1Bitmap* level_Up_Overworld_Text = pBitmaps[player.levelUpOverworldTextFileName];
@@ -1789,18 +1788,16 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             {
                 D2D1_SIZE_F size = level_Up_Overworld_Text->GetSize();
 
-                if (player.textBobbedUp > 20) {
+                if ((std::chrono::steady_clock::now() - player.timePointofLastBob) > std::chrono::milliseconds(250)) {
                     if (player.lastBobWasZero) {
                         player.bobberUpper = 1;
                         player.lastBobWasZero = false;
-                    }
-                    else {
+                    } else {
                         player.bobberUpper = 0;
                         player.lastBobWasZero = true;
                     }
-                    player.textBobbedUp = 0;
+                    player.timePointofLastBob = std::chrono::steady_clock::now();
                 }
-                player.textBobbedUp++;
                 D2D1_RECT_F destRect = D2D1::RectF(player.xPosition - (14 * scalerX), player.yPosition + ((4 - player.bobberUpper) * scalerY),
                     player.xPosition + ((size.width - 14) * scalerX), player.yPosition + ((size.height + 4 - player.bobberUpper) * scalerY));
                 pRenderTarget->DrawBitmap(level_Up_Overworld_Text, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
@@ -1811,7 +1808,6 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         if (player.inLevelUpSequence == true && player.inLevelUpFanfare == false) {
             // Get level up screen bitmap
             ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];
-            /*ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];*/
 
             // Render level up screen
             if (focusedLevelUpBitmap)
