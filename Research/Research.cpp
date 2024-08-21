@@ -75,10 +75,10 @@ LPCWSTR mpBarFilling = L"Sprites\\UI\\MPBar_Filling.png";
 LPCWSTR expBarShell = L"Sprites\\UI\\EXPBar_Shell.png";
 LPCWSTR expBarFilling = L"Sprites\\UI\\EXPBar_Filling.png";
 LPCWSTR skillPanes = L"Sprites\\UI\\Skill Panes.png";
-LPCWSTR Level_Up_Back_Button_Unpressed = L"Sprites\\UI\\Level_Up_Back_Button_Unpressed.png";
-LPCWSTR Level_Up_Back_Button_Pressed = L"Sprites\\UI\\Level_Up_Back_Button_Pressed.png";
-LPCWSTR Level_Up_Confirm_Button_Unpressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Unpressed.png";
-LPCWSTR Level_Up_Confirm_Button_Pressed = L"Sprites\\UI\\Level_Up_Confirm_Button_Pressed.png";
+LPCWSTR Level_Up_Back_Button_Unpressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Back_Button_Unpressed.png";
+LPCWSTR Level_Up_Back_Button_Pressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Back_Button_Pressed.png";
+LPCWSTR Level_Up_Confirm_Button_Unpressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Confirm_Button_Unpressed.png";
+LPCWSTR Level_Up_Confirm_Button_Pressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Confirm_Button_Pressed.png";
 LPCWSTR Level_Up_Overworld_Text_1 = L"Sprites\\UI\\Level_Up_Overworld_Text_1.png";
 LPCWSTR Level_Up_Overworld_Text_2 = L"Sprites\\UI\\Level_Up_Overworld_Text_2.png";
 LPCWSTR Level_Up_Overworld_Text_3 = L"Sprites\\UI\\Level_Up_Overworld_Text_3.png";
@@ -88,12 +88,24 @@ LPCWSTR Level_Up_Overworld_Text_6 = L"Sprites\\UI\\Level_Up_Overworld_Text_6.png
 LPCWSTR Level_Up_Overworld_Text_7 = L"Sprites\\UI\\Level_Up_Overworld_Text_7.png";
 LPCWSTR Level_Up_Overworld_Text_8 = L"Sprites\\UI\\Level_Up_Overworld_Text_8.png";
 LPCWSTR Level_Up_Overworld_Text_9 = L"Sprites\\UI\\Level_Up_Overworld_Text_9.png";
+LPCWSTR Focused_Level_Up_Screen_Shell = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Screen_Shell.png";
+LPCWSTR Focused_Level_Up_Cursor = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Cursor.png";
+LPCWSTR Focused_Level_Up_Up_Down_Arrow = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Up_Down_Arrow.png";
+LPCWSTR Stat_Number_0 = L"Sprites\\UI\\Fonts\\Stat_Number_0.png";
+LPCWSTR Stat_Number_1 = L"Sprites\\UI\\Fonts\\Stat_Number_1.png";
+LPCWSTR Stat_Number_2 = L"Sprites\\UI\\Fonts\\Stat_Number_2.png";
+LPCWSTR Stat_Number_3 = L"Sprites\\UI\\Fonts\\Stat_Number_3.png";
+LPCWSTR Stat_Number_4 = L"Sprites\\UI\\Fonts\\Stat_Number_4.png";
+LPCWSTR Stat_Number_5 = L"Sprites\\UI\\Fonts\\Stat_Number_5.png";
+LPCWSTR Stat_Number_6 = L"Sprites\\UI\\Fonts\\Stat_Number_6.png";
+LPCWSTR Stat_Number_7 = L"Sprites\\UI\\Fonts\\Stat_Number_7.png";
+LPCWSTR Stat_Number_8 = L"Sprites\\UI\\Fonts\\Stat_Number_8.png";
+LPCWSTR Stat_Number_9 = L"Sprites\\UI\\Fonts\\Stat_Number_9.png";
 
 
 
 // Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
-LPCWSTR FocusedLevelUpScreen = L"Sprites\\UI\\Focused_Level_up_Screen.png"; 
 
 // Maps of info regarding various enemies
 std::map<const std::string, int> experience;
@@ -322,15 +334,15 @@ public:
     double maxHP = 100;
     double MP = 50;
     double maxMP = 50;
-    int strength = 9;
+    int strength = 11;
     int dexterity = 10;
-    int intelligence = 5;
-    int wisdom = 7;
-    int defense = 5;
-    int magicDefense = 3;
-    int trueDefense = 1;
+    int intelligence = 52;
+    int wisdom = 71;
+    int defense = 10;
+    int magicDefense = 34;
+    int trueDefense = 11;
     int agility = 10;
-    int luck = 8;
+    int luck = 81;
     
     // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
@@ -1106,7 +1118,7 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(expBarFilling);
 
     // Level Up
-    spriteData.emplace_back(FocusedLevelUpScreen);
+    spriteData.emplace_back(Focused_Level_Up_Screen_Shell);
     spriteData.emplace_back(Level_Up_Back_Button_Pressed);
     spriteData.emplace_back(Level_Up_Back_Button_Unpressed);
     spriteData.emplace_back(Level_Up_Confirm_Button_Pressed);
@@ -1120,6 +1132,18 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Level_Up_Overworld_Text_7);
     spriteData.emplace_back(Level_Up_Overworld_Text_8);
     spriteData.emplace_back(Level_Up_Overworld_Text_9);
+
+    // Status Numbers
+    spriteData.emplace_back(Stat_Number_0);
+    spriteData.emplace_back(Stat_Number_1);
+    spriteData.emplace_back(Stat_Number_2);
+    spriteData.emplace_back(Stat_Number_3);
+    spriteData.emplace_back(Stat_Number_4);
+    spriteData.emplace_back(Stat_Number_5);
+    spriteData.emplace_back(Stat_Number_6);
+    spriteData.emplace_back(Stat_Number_7);
+    spriteData.emplace_back(Stat_Number_8);
+    spriteData.emplace_back(Stat_Number_9);
 
 
     //---------------- Environment -----------------//
@@ -1441,6 +1465,85 @@ void DiscardDeviceResources()
 //    }
 //}
 
+void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2) {
+    std::string statString = std::to_string(stat);
+
+
+    
+    switch (statString[0])
+    {
+    case '0':
+        bitmap1 = pBitmaps[Stat_Number_0];
+        break;
+    case '1':
+        bitmap1 = pBitmaps[Stat_Number_1];
+        break;
+    case '2':
+        bitmap1 = pBitmaps[Stat_Number_2];
+        break;
+    case '3':
+        bitmap1 = pBitmaps[Stat_Number_3];
+        break;
+    case '4':
+        bitmap1 = pBitmaps[Stat_Number_4];
+        break;
+    case '5':
+        bitmap1 = pBitmaps[Stat_Number_5];
+        break;
+    case '6':
+        bitmap1 = pBitmaps[Stat_Number_6];
+        break;
+    case '7':
+        bitmap1 = pBitmaps[Stat_Number_7];
+        break;
+    case '8':
+        bitmap1 = pBitmaps[Stat_Number_8];
+        break;
+    case '9':
+        bitmap1 = pBitmaps[Stat_Number_9];
+        break;
+    }
+
+    if (stat >= 10) {
+        switch (statString[1])
+        {
+        case '0':
+            bitmap2 = pBitmaps[Stat_Number_0];
+            break;
+        case '1':
+            bitmap2 = pBitmaps[Stat_Number_1];
+            break;
+        case '2':
+            bitmap2 = pBitmaps[Stat_Number_2];
+            break;
+        case '3':
+            bitmap2 = pBitmaps[Stat_Number_3];
+            break;
+        case '4':
+            bitmap2 = pBitmaps[Stat_Number_4];
+            break;
+        case '5':
+            bitmap2 = pBitmaps[Stat_Number_5];
+            break;
+        case '6':
+            bitmap2 = pBitmaps[Stat_Number_6];
+            break;
+        case '7':
+            bitmap2 = pBitmaps[Stat_Number_7];
+            break;
+        case '8':
+            bitmap2 = pBitmaps[Stat_Number_8];
+            break;
+        case '9':
+            bitmap2 = pBitmaps[Stat_Number_9];
+            break;
+        }
+    }
+    else {
+        bitmap2 = nullptr;
+    }
+}
+
 void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vector<Enemy> enemies)
 {
     if (!pRenderTarget)
@@ -1745,38 +1848,48 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
             }
             
-            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(37)) {
-
-                player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
+            if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(64)) {
 
                 if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_2;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_2) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_3;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_4;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_5;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_6;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_7;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_7) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_8;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_8) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_9;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_9) {
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
+                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_9 &&
+                           std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime >= std::chrono::milliseconds(250)) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
+                    player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 }
+
+                
             }
 
             // Get level up overworld text bitmap
@@ -1788,7 +1901,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             {
                 D2D1_SIZE_F size = level_Up_Overworld_Text->GetSize();
 
-                if ((std::chrono::steady_clock::now() - player.timePointofLastBob) > std::chrono::milliseconds(250)) {
+                /*if ((std::chrono::steady_clock::now() - player.timePointofLastBob) > std::chrono::milliseconds(250)) {
                     if (player.lastBobWasZero) {
                         player.bobberUpper = 1;
                         player.lastBobWasZero = false;
@@ -1797,7 +1910,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                         player.lastBobWasZero = true;
                     }
                     player.timePointofLastBob = std::chrono::steady_clock::now();
-                }
+                }*/
                 D2D1_RECT_F destRect = D2D1::RectF(player.xPosition - (14 * scalerX), player.yPosition + ((4 - player.bobberUpper) * scalerY),
                     player.xPosition + ((size.width - 14) * scalerX), player.yPosition + ((size.height + 4 - player.bobberUpper) * scalerY));
                 pRenderTarget->DrawBitmap(level_Up_Overworld_Text, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
@@ -1806,18 +1919,225 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
 
         // If the player has leveled up
         if (player.inLevelUpSequence == true && player.inLevelUpFanfare == false) {
-            // Get level up screen bitmap
-            ID2D1Bitmap* focusedLevelUpBitmap = pBitmaps[FocusedLevelUpScreen];
+            // Get level up screen shell bitmap
+            ID2D1Bitmap* shellBitmap = pBitmaps[Focused_Level_Up_Screen_Shell];
 
-            // Render level up screen
-            if (focusedLevelUpBitmap)
+            // Render level up screen shell
+            if (shellBitmap)
             {
-                D2D1_SIZE_F size = focusedLevelUpBitmap->GetSize();
+                D2D1_SIZE_F size = shellBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (64 * scalerX), 1 * scalerY,
                                                   ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
-                pRenderTarget->DrawBitmap(focusedLevelUpBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                pRenderTarget->DrawBitmap(shellBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
 
+            // Get back button bitmap
+            ID2D1Bitmap* backButtonBitmap = pBitmaps[Level_Up_Back_Button_Unpressed];
+
+            // Render back button
+            if (backButtonBitmap)
+            {
+                D2D1_SIZE_F size = backButtonBitmap->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (84 * scalerX), 207 * scalerY,
+                    ((leftBorder + (84 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
+                pRenderTarget->DrawBitmap(backButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+
+            // Get confirm button bitmap
+            ID2D1Bitmap* confirmButtonBitmap = pBitmaps[Level_Up_Confirm_Button_Unpressed];
+
+            // Render confirm button
+            if (confirmButtonBitmap)
+            {
+                D2D1_SIZE_F size = confirmButtonBitmap->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (135 * scalerX), 207 * scalerY,
+                    ((leftBorder + (135 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
+                pRenderTarget->DrawBitmap(confirmButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+
+            // Get stats bitmap
+            ID2D1Bitmap* strStat1;
+            ID2D1Bitmap* strStat2;
+            TranslateStatstoBitmap(player.strength, strStat1, strStat2);
+
+            ID2D1Bitmap* dexStat1;
+            ID2D1Bitmap* dexStat2;
+            TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2);
+
+            ID2D1Bitmap* intStat1;
+            ID2D1Bitmap* intStat2;
+            TranslateStatstoBitmap(player.intelligence, intStat1, intStat2);
+
+            ID2D1Bitmap* wisStat1;
+            ID2D1Bitmap* wisStat2;
+            TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2);
+
+            ID2D1Bitmap* defStat1;
+            ID2D1Bitmap* defStat2;
+            TranslateStatstoBitmap(player.defense, defStat1, defStat2);
+
+            ID2D1Bitmap* mDefStat1;
+            ID2D1Bitmap* mDeftat2;
+            TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDeftat2);
+
+            ID2D1Bitmap* tDefStat1;
+            ID2D1Bitmap* tDefStat2;
+            TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2);
+
+            ID2D1Bitmap* agiStat1;
+            ID2D1Bitmap* agiStat2;
+            TranslateStatstoBitmap(player.agility, agiStat1, agiStat2);
+
+            ID2D1Bitmap* luckStat1;
+            ID2D1Bitmap* luckStat2;
+            TranslateStatstoBitmap(player.luck, luckStat1, luckStat2);
+
+            // Render stats
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (dexStat1)
+            {
+                D2D1_SIZE_F dexSize1 = dexStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 60 * scalerY,
+                    (leftBorder + ((161 + dexSize1.width) * scalerX)), ((dexSize1.height + 60) * scalerY));
+                pRenderTarget->DrawBitmap(dexStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (dexStat2)
+                {
+                    D2D1_SIZE_F dexSize2 = dexStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + dexSize1.width) * scalerX), 60 * scalerY,
+                        (leftBorder + ((162 + dexSize1.width + dexSize2.width) * scalerX)), ((dexSize2.height + 60) * scalerY));
+                    pRenderTarget->DrawBitmap(dexStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (intStat1)
+            {
+                D2D1_SIZE_F intSize1 = intStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 79 * scalerY,
+                    (leftBorder + ((161 + intSize1.width) * scalerX)), ((intSize1.height + 79) * scalerY));
+                pRenderTarget->DrawBitmap(intStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (intStat2)
+                {
+                    D2D1_SIZE_F intSize2 = intStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + intSize1.width) * scalerX), 79 * scalerY,
+                        (leftBorder + ((162 + intSize1.width + intSize2.width) * scalerX)), ((intSize2.height + 79) * scalerY));
+                    pRenderTarget->DrawBitmap(intStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            if (strStat1)
+            {
+                D2D1_SIZE_F strSize1 = strStat1->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
+                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
+                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                if (strStat2)
+                {
+                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
+                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
+                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
+            
 
             //// Get confirm bitmap
             //ID2D1Bitmap* confirmButton = pBitmaps[Level_Up_Confirm_Button_Unpressed];
