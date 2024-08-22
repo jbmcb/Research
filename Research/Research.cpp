@@ -334,7 +334,7 @@ public:
     double maxHP = 100;
     double MP = 50;
     double maxMP = 50;
-    int strength = 11;
+    int strength = 191;
     int dexterity = 10;
     int intelligence = 52;
     int wisdom = 71;
@@ -1465,7 +1465,7 @@ void DiscardDeviceResources()
 //    }
 //}
 
-void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2) {
+void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2, ID2D1Bitmap*& bitmap3) {
     std::string statString = std::to_string(stat);
 
 
@@ -1542,7 +1542,82 @@ void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitma
     else {
         bitmap2 = nullptr;
     }
+
+    if (stat >= 100) {
+        switch (statString[2])
+        {
+        case '0':
+            bitmap3 = pBitmaps[Stat_Number_0];
+            break;
+        case '1':
+            bitmap3 = pBitmaps[Stat_Number_1];
+            break;
+        case '2':
+            bitmap3 = pBitmaps[Stat_Number_2];
+            break;
+        case '3':
+            bitmap3 = pBitmaps[Stat_Number_3];
+            break;
+        case '4':
+            bitmap3 = pBitmaps[Stat_Number_4];
+            break;
+        case '5':
+            bitmap3 = pBitmaps[Stat_Number_5];
+            break;
+        case '6':
+            bitmap3 = pBitmaps[Stat_Number_6];
+            break;
+        case '7':
+            bitmap3 = pBitmaps[Stat_Number_7];
+            break;
+        case '8':
+            bitmap3 = pBitmaps[Stat_Number_8];
+            break;
+        case '9':
+            bitmap3 = pBitmaps[Stat_Number_9];
+            break;
+        }
+    }
+    else {
+        bitmap3 = nullptr;
+    }
 }
+
+void RenderStats(ID2D1Bitmap* stat1, ID2D1Bitmap* stat2, ID2D1Bitmap* stat3, int yOffset) {
+    int xOffset1, xOffset2, xOffset3;
+    if (stat3) {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_SIZE_F size2 = stat2->GetSize();
+        D2D1_SIZE_F size3 = stat3->GetSize();
+        xOffset1 = 173 - size1.width - size2.width - size3.width;
+        xOffset2 = 173 - size2.width - size3.width;
+        xOffset3 = 173 - size3.width;56ttttttttttttttttttttttttttttttttttttttttttttttttt]\
+    }
+    if (stat1)
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((173 - size1.width) * scalerX), yOffset * scalerY,
+            (leftBorder + ((161 + size1.width) * scalerX)), ((size1.height + yOffset) * scalerY));
+        pRenderTarget->DrawBitmap(stat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+        if (stat2)
+        {
+            D2D1_SIZE_F size2 = stat2->GetSize();
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + size1.width) * scalerX), yOffset * scalerY,
+                (leftBorder + ((162 + size1.width + size2.width) * scalerX)), ((size2.height + yOffset) * scalerY));
+            pRenderTarget->DrawBitmap(stat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+            if (stat3)
+            {
+                D2D1_SIZE_F size3 = stat3->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((163 + size1.width + size2.width) * scalerX), yOffset * scalerY,
+                    (leftBorder + ((163 + size1.width + size2.width + size3.width) * scalerX)), ((size3.height + yOffset) * scalerY));
+                pRenderTarget->DrawBitmap(stat3, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+        }
+    }
+}
+
 
 void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vector<Enemy> enemies)
 {
@@ -1958,185 +2033,59 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             // Get stats bitmap
             ID2D1Bitmap* strStat1;
             ID2D1Bitmap* strStat2;
-            TranslateStatstoBitmap(player.strength, strStat1, strStat2);
+            ID2D1Bitmap* strStat3;
+            TranslateStatstoBitmap(player.strength, strStat1, strStat2, strStat3);
 
             ID2D1Bitmap* dexStat1;
             ID2D1Bitmap* dexStat2;
-            TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2);
+            ID2D1Bitmap* dexStat3;
+            TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3);
 
             ID2D1Bitmap* intStat1;
             ID2D1Bitmap* intStat2;
-            TranslateStatstoBitmap(player.intelligence, intStat1, intStat2);
+            ID2D1Bitmap* intStat3;
+            TranslateStatstoBitmap(player.intelligence, intStat1, intStat2, intStat3);
 
             ID2D1Bitmap* wisStat1;
             ID2D1Bitmap* wisStat2;
-            TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2);
+            ID2D1Bitmap* wisStat3;
+            TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2, wisStat3);
 
             ID2D1Bitmap* defStat1;
             ID2D1Bitmap* defStat2;
-            TranslateStatstoBitmap(player.defense, defStat1, defStat2);
+            ID2D1Bitmap* defStat3;
+            TranslateStatstoBitmap(player.defense, defStat1, defStat2, defStat3);
 
             ID2D1Bitmap* mDefStat1;
-            ID2D1Bitmap* mDeftat2;
-            TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDeftat2);
+            ID2D1Bitmap* mDefStat2;
+            ID2D1Bitmap* mDefStat3;
+            TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDefStat2, mDefStat3);
 
             ID2D1Bitmap* tDefStat1;
             ID2D1Bitmap* tDefStat2;
-            TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2);
+            ID2D1Bitmap* tDefStat3;
+            TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2, tDefStat3);
 
             ID2D1Bitmap* agiStat1;
             ID2D1Bitmap* agiStat2;
-            TranslateStatstoBitmap(player.agility, agiStat1, agiStat2);
+            ID2D1Bitmap* agiStat3;
+            TranslateStatstoBitmap(player.agility, agiStat1, agiStat2, agiStat3);
 
             ID2D1Bitmap* luckStat1;
             ID2D1Bitmap* luckStat2;
-            TranslateStatstoBitmap(player.luck, luckStat1, luckStat2);
+            ID2D1Bitmap* luckStat3;
+            TranslateStatstoBitmap(player.luck, luckStat1, luckStat2, luckStat3);
 
             // Render stats
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (dexStat1)
-            {
-                D2D1_SIZE_F dexSize1 = dexStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 60 * scalerY,
-                    (leftBorder + ((161 + dexSize1.width) * scalerX)), ((dexSize1.height + 60) * scalerY));
-                pRenderTarget->DrawBitmap(dexStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (dexStat2)
-                {
-                    D2D1_SIZE_F dexSize2 = dexStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + dexSize1.width) * scalerX), 60 * scalerY,
-                        (leftBorder + ((162 + dexSize1.width + dexSize2.width) * scalerX)), ((dexSize2.height + 60) * scalerY));
-                    pRenderTarget->DrawBitmap(dexStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (intStat1)
-            {
-                D2D1_SIZE_F intSize1 = intStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 79 * scalerY,
-                    (leftBorder + ((161 + intSize1.width) * scalerX)), ((intSize1.height + 79) * scalerY));
-                pRenderTarget->DrawBitmap(intStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (intStat2)
-                {
-                    D2D1_SIZE_F intSize2 = intStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + intSize1.width) * scalerX), 79 * scalerY,
-                        (leftBorder + ((162 + intSize1.width + intSize2.width) * scalerX)), ((intSize2.height + 79) * scalerY));
-                    pRenderTarget->DrawBitmap(intStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
-            if (strStat1)
-            {
-                D2D1_SIZE_F strSize1 = strStat1->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (161 * scalerX), 41 * scalerY,
-                    (leftBorder + ((161 + strSize1.width) * scalerX)), ((strSize1.height + 41) * scalerY));
-                pRenderTarget->DrawBitmap(strStat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-                if (strStat2)
-                {
-                    D2D1_SIZE_F strSize2 = strStat2->GetSize();
-                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((161 + strSize1.width) * scalerX), 41 * scalerY,
-                        (leftBorder + ((161 + strSize1.width + strSize2.width) * scalerX)), ((strSize2.height + 41) * scalerY));
-                    pRenderTarget->DrawBitmap(strStat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-                }
-            }
-
+            RenderStats(strStat1, strStat2, strStat3, 41);
+            RenderStats(dexStat1, dexStat2, dexStat3, 60);
+            RenderStats(intStat1, intStat2, intStat3, 79);
+            RenderStats(wisStat1, wisStat2, wisStat3, 98);
+            RenderStats(defStat1, defStat2, defStat3, 117);
+            RenderStats(mDefStat1, mDefStat2, mDefStat3, 136);
+            RenderStats(tDefStat1, tDefStat2, tDefStat3, 155);
+            RenderStats(agiStat1, agiStat2, agiStat3, 174);
+            RenderStats(luckStat1, luckStat2, luckStat3, 193);
             
 
             //// Get confirm bitmap
