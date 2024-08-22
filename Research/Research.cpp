@@ -90,7 +90,7 @@ LPCWSTR Level_Up_Overworld_Text_8 = L"Sprites\\UI\\Level_Up_Overworld_Text_8.png
 LPCWSTR Level_Up_Overworld_Text_9 = L"Sprites\\UI\\Level_Up_Overworld_Text_9.png";
 LPCWSTR Focused_Level_Up_Screen_Shell = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Screen_Shell.png";
 LPCWSTR Focused_Level_Up_Cursor = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Cursor.png";
-LPCWSTR Focused_Level_Up_Up_Down_Arrow = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Up_Down_Arrow.png";
+LPCWSTR Focused_Level_Up_Down_Arrow = L"Sprites\\UI\\Focused Level Up Screen\\Focused_Level_Up_Up_Down_Arrow.png";
 LPCWSTR Stat_Number_0 = L"Sprites\\UI\\Fonts\\Stat_Number_0.png";
 LPCWSTR Stat_Number_1 = L"Sprites\\UI\\Fonts\\Stat_Number_1.png";
 LPCWSTR Stat_Number_2 = L"Sprites\\UI\\Fonts\\Stat_Number_2.png";
@@ -101,6 +101,16 @@ LPCWSTR Stat_Number_6 = L"Sprites\\UI\\Fonts\\Stat_Number_6.png";
 LPCWSTR Stat_Number_7 = L"Sprites\\UI\\Fonts\\Stat_Number_7.png";
 LPCWSTR Stat_Number_8 = L"Sprites\\UI\\Fonts\\Stat_Number_8.png";
 LPCWSTR Stat_Number_9 = L"Sprites\\UI\\Fonts\\Stat_Number_9.png";
+LPCWSTR Yellow_Stat_Number_0 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_0.png";
+LPCWSTR Yellow_Stat_Number_1 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_1.png";
+LPCWSTR Yellow_Stat_Number_2 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_2.png";
+LPCWSTR Yellow_Stat_Number_3 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_3.png";
+LPCWSTR Yellow_Stat_Number_4 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_4.png";
+LPCWSTR Yellow_Stat_Number_5 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_5.png";
+LPCWSTR Yellow_Stat_Number_6 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_6.png";
+LPCWSTR Yellow_Stat_Number_7 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_7.png";
+LPCWSTR Yellow_Stat_Number_8 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_8.png";
+LPCWSTR Yellow_Stat_Number_9 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_9.png";
 
 
 
@@ -334,15 +344,23 @@ public:
     double maxHP = 100;
     double MP = 50;
     double maxMP = 50;
-    int strength = 191;
-    int dexterity = 10;
-    int intelligence = 52;
-    int wisdom = 71;
-    int defense = 10;
-    int magicDefense = 34;
-    int trueDefense = 11;
-    int agility = 10;
-    int luck = 81;
+    int strength = 11;
+    int dexterity = 2;
+    int intelligence = 1;
+    int wisdom = 12;
+    int defense = 23;
+    int magicDefense = 111;
+    int trueDefense = 121;
+    int agility = 122;
+    int luck = 999;
+
+    int statSelection = 0;
+    std::chrono::steady_clock::time_point timeSinceLastStatSelection = std::chrono::steady_clock::now();
+    bool statSelected = false;
+    std::chrono::steady_clock::time_point backButtonAnimationInterval = std::chrono::steady_clock::now();
+    LPCWSTR lastBackButtonFile = Level_Up_Back_Button_Unpressed;
+    std::chrono::steady_clock::time_point confirmButtonAnimationInterval = std::chrono::steady_clock::now();
+    LPCWSTR lastConfirmButtonFile = Level_Up_Confirm_Button_Unpressed;
     
     // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
@@ -1144,6 +1162,18 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Stat_Number_7);
     spriteData.emplace_back(Stat_Number_8);
     spriteData.emplace_back(Stat_Number_9);
+    spriteData.emplace_back(Yellow_Stat_Number_0);
+    spriteData.emplace_back(Yellow_Stat_Number_1);
+    spriteData.emplace_back(Yellow_Stat_Number_2);
+    spriteData.emplace_back(Yellow_Stat_Number_3);
+    spriteData.emplace_back(Yellow_Stat_Number_4);
+    spriteData.emplace_back(Yellow_Stat_Number_5);
+    spriteData.emplace_back(Yellow_Stat_Number_6);
+    spriteData.emplace_back(Yellow_Stat_Number_7);
+    spriteData.emplace_back(Yellow_Stat_Number_8);
+    spriteData.emplace_back(Yellow_Stat_Number_9);
+
+    spriteData.emplace_back(Focused_Level_Up_Down_Arrow);
 
 
     //---------------- Environment -----------------//
@@ -1465,153 +1495,285 @@ void DiscardDeviceResources()
 //    }
 //}
 
-void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2, ID2D1Bitmap*& bitmap3) {
+void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2, ID2D1Bitmap*& bitmap3, bool selected) {
     std::string statString = std::to_string(stat);
 
 
-    
-    switch (statString[0])
+    if (!selected) 
     {
-    case '0':
-        bitmap1 = pBitmaps[Stat_Number_0];
-        break;
-    case '1':
-        bitmap1 = pBitmaps[Stat_Number_1];
-        break;
-    case '2':
-        bitmap1 = pBitmaps[Stat_Number_2];
-        break;
-    case '3':
-        bitmap1 = pBitmaps[Stat_Number_3];
-        break;
-    case '4':
-        bitmap1 = pBitmaps[Stat_Number_4];
-        break;
-    case '5':
-        bitmap1 = pBitmaps[Stat_Number_5];
-        break;
-    case '6':
-        bitmap1 = pBitmaps[Stat_Number_6];
-        break;
-    case '7':
-        bitmap1 = pBitmaps[Stat_Number_7];
-        break;
-    case '8':
-        bitmap1 = pBitmaps[Stat_Number_8];
-        break;
-    case '9':
-        bitmap1 = pBitmaps[Stat_Number_9];
-        break;
-    }
-
-    if (stat >= 10) {
-        switch (statString[1])
+        switch (statString[0])
         {
         case '0':
-            bitmap2 = pBitmaps[Stat_Number_0];
+            bitmap1 = pBitmaps[Stat_Number_0];
             break;
         case '1':
-            bitmap2 = pBitmaps[Stat_Number_1];
+            bitmap1 = pBitmaps[Stat_Number_1];
             break;
         case '2':
-            bitmap2 = pBitmaps[Stat_Number_2];
+            bitmap1 = pBitmaps[Stat_Number_2];
             break;
         case '3':
-            bitmap2 = pBitmaps[Stat_Number_3];
+            bitmap1 = pBitmaps[Stat_Number_3];
             break;
         case '4':
-            bitmap2 = pBitmaps[Stat_Number_4];
+            bitmap1 = pBitmaps[Stat_Number_4];
             break;
         case '5':
-            bitmap2 = pBitmaps[Stat_Number_5];
+            bitmap1 = pBitmaps[Stat_Number_5];
             break;
         case '6':
-            bitmap2 = pBitmaps[Stat_Number_6];
+            bitmap1 = pBitmaps[Stat_Number_6];
             break;
         case '7':
-            bitmap2 = pBitmaps[Stat_Number_7];
+            bitmap1 = pBitmaps[Stat_Number_7];
             break;
         case '8':
-            bitmap2 = pBitmaps[Stat_Number_8];
+            bitmap1 = pBitmaps[Stat_Number_8];
             break;
         case '9':
-            bitmap2 = pBitmaps[Stat_Number_9];
+            bitmap1 = pBitmaps[Stat_Number_9];
             break;
         }
-    }
-    else {
-        bitmap2 = nullptr;
+
+        if (stat >= 10) {
+            switch (statString[1])
+            {
+            case '0':
+                bitmap2 = pBitmaps[Stat_Number_0];
+                break;
+            case '1':
+                bitmap2 = pBitmaps[Stat_Number_1];
+                break;
+            case '2':
+                bitmap2 = pBitmaps[Stat_Number_2];
+                break;
+            case '3':
+                bitmap2 = pBitmaps[Stat_Number_3];
+                break;
+            case '4':
+                bitmap2 = pBitmaps[Stat_Number_4];
+                break;
+            case '5':
+                bitmap2 = pBitmaps[Stat_Number_5];
+                break;
+            case '6':
+                bitmap2 = pBitmaps[Stat_Number_6];
+                break;
+            case '7':
+                bitmap2 = pBitmaps[Stat_Number_7];
+                break;
+            case '8':
+                bitmap2 = pBitmaps[Stat_Number_8];
+                break;
+            case '9':
+                bitmap2 = pBitmaps[Stat_Number_9];
+                break;
+            }
+        }
+        else {
+            bitmap2 = nullptr;
+        }
+
+        if (stat >= 100) {
+            switch (statString[2])
+            {
+            case '0':
+                bitmap3 = pBitmaps[Stat_Number_0];
+                break;
+            case '1':
+                bitmap3 = pBitmaps[Stat_Number_1];
+                break;
+            case '2':
+                bitmap3 = pBitmaps[Stat_Number_2];
+                break;
+            case '3':
+                bitmap3 = pBitmaps[Stat_Number_3];
+                break;
+            case '4':
+                bitmap3 = pBitmaps[Stat_Number_4];
+                break;
+            case '5':
+                bitmap3 = pBitmaps[Stat_Number_5];
+                break;
+            case '6':
+                bitmap3 = pBitmaps[Stat_Number_6];
+                break;
+            case '7':
+                bitmap3 = pBitmaps[Stat_Number_7];
+                break;
+            case '8':
+                bitmap3 = pBitmaps[Stat_Number_8];
+                break;
+            case '9':
+                bitmap3 = pBitmaps[Stat_Number_9];
+                break;
+            }
+        }
+        else {
+            bitmap3 = nullptr;
+        }
     }
 
-    if (stat >= 100) {
-        switch (statString[2])
+    else
+    {
+        switch (statString[0])
         {
         case '0':
-            bitmap3 = pBitmaps[Stat_Number_0];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_0];
             break;
         case '1':
-            bitmap3 = pBitmaps[Stat_Number_1];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_1];
             break;
         case '2':
-            bitmap3 = pBitmaps[Stat_Number_2];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_2];
             break;
         case '3':
-            bitmap3 = pBitmaps[Stat_Number_3];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_3];
             break;
         case '4':
-            bitmap3 = pBitmaps[Stat_Number_4];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_4];
             break;
         case '5':
-            bitmap3 = pBitmaps[Stat_Number_5];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_5];
             break;
         case '6':
-            bitmap3 = pBitmaps[Stat_Number_6];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_6];
             break;
         case '7':
-            bitmap3 = pBitmaps[Stat_Number_7];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_7];
             break;
         case '8':
-            bitmap3 = pBitmaps[Stat_Number_8];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_8];
             break;
         case '9':
-            bitmap3 = pBitmaps[Stat_Number_9];
+            bitmap1 = pBitmaps[Yellow_Stat_Number_9];
             break;
         }
-    }
-    else {
-        bitmap3 = nullptr;
+
+        if (stat >= 10) {
+            switch (statString[1])
+            {
+            case '0':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_0];
+                break;
+            case '1':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_1];
+                break;
+            case '2':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_2];
+                break;
+            case '3':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_3];
+                break;
+            case '4':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_4];
+                break;
+            case '5':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_5];
+                break;
+            case '6':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_6];
+                break;
+            case '7':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_7];
+                break;
+            case '8':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_8];
+                break;
+            case '9':
+                bitmap2 = pBitmaps[Yellow_Stat_Number_9];
+                break;
+            }
+        }
+        else {
+            bitmap2 = nullptr;
+        }
+
+        if (stat >= 100) {
+            switch (statString[2])
+            {
+            case '0':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_0];
+                break;
+            case '1':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_1];
+                break;
+            case '2':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_2];
+                break;
+            case '3':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_3];
+                break;
+            case '4':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_4];
+                break;
+            case '5':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_5];
+                break;
+            case '6':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_6];
+                break;
+            case '7':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_7];
+                break;
+            case '8':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_8];
+                break;
+            case '9':
+                bitmap3 = pBitmaps[Yellow_Stat_Number_9];
+                break;
+            }
+        }
+        else {
+            bitmap3 = nullptr;
+        }
     }
 }
 
 void RenderStats(ID2D1Bitmap* stat1, ID2D1Bitmap* stat2, ID2D1Bitmap* stat3, int yOffset) {
     int xOffset1, xOffset2, xOffset3;
-    if (stat3) {
+
+    if (stat1 && stat2 && stat3) 
+    {
         D2D1_SIZE_F size1 = stat1->GetSize();
         D2D1_SIZE_F size2 = stat2->GetSize();
         D2D1_SIZE_F size3 = stat3->GetSize();
-        xOffset1 = 173 - size1.width - size2.width - size3.width;
-        xOffset2 = 173 - size2.width - size3.width;
-        xOffset3 = 173 - size3.width;56ttttttttttttttttttttttttttttttttttttttttttttttttt]\
+        xOffset1 = 171 - size1.width - size2.width - size3.width;
+        xOffset2 = 172 - size2.width - size3.width;
+        xOffset3 = 173 - size3.width;
+    } 
+    else if (stat1 && stat2) 
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_SIZE_F size2 = stat2->GetSize();
+        xOffset1 = 172 - size1.width - size2.width;
+        xOffset2 = 173 - size2.width;
+    } 
+    else if (stat1) // not necessary, but could prevent errors if stat were to somehow be emptied
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        xOffset1 = 173 - size1.width;
     }
+
     if (stat1)
     {
         D2D1_SIZE_F size1 = stat1->GetSize();
-        D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((173 - size1.width) * scalerX), yOffset * scalerY,
-            (leftBorder + ((161 + size1.width) * scalerX)), ((size1.height + yOffset) * scalerY));
+        D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset1 * scalerX), yOffset * scalerY,
+            (leftBorder + ((xOffset1 + size1.width) * scalerX)), ((size1.height + yOffset) * scalerY));
         pRenderTarget->DrawBitmap(stat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
         if (stat2)
         {
             D2D1_SIZE_F size2 = stat2->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((162 + size1.width) * scalerX), yOffset * scalerY,
-                (leftBorder + ((162 + size1.width + size2.width) * scalerX)), ((size2.height + yOffset) * scalerY));
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset2 * scalerX), yOffset * scalerY,
+                (leftBorder + ((xOffset2 + size2.width) * scalerX)), ((size2.height + yOffset) * scalerY));
             pRenderTarget->DrawBitmap(stat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
             if (stat3)
             {
                 D2D1_SIZE_F size3 = stat3->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + ((163 + size1.width + size2.width) * scalerX), yOffset * scalerY,
-                    (leftBorder + ((163 + size1.width + size2.width + size3.width) * scalerX)), ((size3.height + yOffset) * scalerY));
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset3 * scalerX), yOffset * scalerY,
+                    (leftBorder + ((xOffset3 + size3.width) * scalerX)), ((size3.height + yOffset) * scalerY));
                 pRenderTarget->DrawBitmap(stat3, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
         }
@@ -2006,12 +2168,160 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 pRenderTarget->DrawBitmap(shellBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
 
+            int yArrowOffset;
+
+            // Get stats bitmap
+            ID2D1Bitmap* strStat1;
+            ID2D1Bitmap* strStat2;
+            ID2D1Bitmap* strStat3;
+            if (player.statSelection == 0) {
+                TranslateStatstoBitmap(player.strength, strStat1, strStat2, strStat3, true);
+                yArrowOffset = 41;
+            }
+            else {
+                TranslateStatstoBitmap(player.strength, strStat1, strStat2, strStat3, false);
+            }
+
+            ID2D1Bitmap* dexStat1;
+            ID2D1Bitmap* dexStat2;
+            ID2D1Bitmap* dexStat3;
+            if (player.statSelection == 1) {
+                TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3, true);
+                yArrowOffset = 60;
+            } else {
+                TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3, false);
+            }
+
+            ID2D1Bitmap* intStat1;
+            ID2D1Bitmap* intStat2;
+            ID2D1Bitmap* intStat3;
+            if (player.statSelection == 2) {
+                TranslateStatstoBitmap(player.intelligence, intStat1, intStat2, intStat3, true);
+                yArrowOffset = 79;
+            }
+            else {
+                TranslateStatstoBitmap(player.intelligence, intStat1, intStat2, intStat3, false);
+            }
+
+            ID2D1Bitmap* wisStat1;
+            ID2D1Bitmap* wisStat2;
+            ID2D1Bitmap* wisStat3;
+            if (player.statSelection == 3) {
+                TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2, wisStat3, true);
+                yArrowOffset = 98;
+            }
+            else {
+                TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2, wisStat3, false);
+            }
+
+            ID2D1Bitmap* defStat1;
+            ID2D1Bitmap* defStat2;
+            ID2D1Bitmap* defStat3;
+            if (player.statSelection == 4) {
+                TranslateStatstoBitmap(player.defense, defStat1, defStat2, defStat3, true);
+                yArrowOffset = 117;
+            }
+            else {
+                TranslateStatstoBitmap(player.defense, defStat1, defStat2, defStat3, false);
+            }
+
+            ID2D1Bitmap* mDefStat1;
+            ID2D1Bitmap* mDefStat2;
+            ID2D1Bitmap* mDefStat3;
+            if (player.statSelection == 5) {
+                TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDefStat2, mDefStat3, true);
+                yArrowOffset = 136;
+            }
+            else {
+                TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDefStat2, mDefStat3, false);
+            }
+
+            ID2D1Bitmap* tDefStat1;
+            ID2D1Bitmap* tDefStat2;
+            ID2D1Bitmap* tDefStat3;
+            if (player.statSelection == 6) {
+                TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2, tDefStat3, true);
+                yArrowOffset = 155;
+            }
+            else {
+                TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2, tDefStat3, false);
+            }
+
+            ID2D1Bitmap* agiStat1;
+            ID2D1Bitmap* agiStat2;
+            ID2D1Bitmap* agiStat3;
+            if (player.statSelection == 7) {
+                TranslateStatstoBitmap(player.agility, agiStat1, agiStat2, agiStat3, true);
+                yArrowOffset = 174;
+            }
+            else {
+                TranslateStatstoBitmap(player.agility, agiStat1, agiStat2, agiStat3, false);
+            }
+
+            ID2D1Bitmap* luckStat1;
+            ID2D1Bitmap* luckStat2;
+            ID2D1Bitmap* luckStat3;
+            if (player.statSelection == 8) {
+                TranslateStatstoBitmap(player.luck, luckStat1, luckStat2, luckStat3, true);
+                yArrowOffset = 193;
+            }
+            else {
+                TranslateStatstoBitmap(player.luck, luckStat1, luckStat2, luckStat3, false);
+            }
+
+            // Render stats
+            RenderStats(strStat1, strStat2, strStat3, 41);
+            RenderStats(dexStat1, dexStat2, dexStat3, 60);
+            RenderStats(intStat1, intStat2, intStat3, 79);
+            RenderStats(wisStat1, wisStat2, wisStat3, 98);
+            RenderStats(defStat1, defStat2, defStat3, 117);
+            RenderStats(mDefStat1, mDefStat2, mDefStat3, 136);
+            RenderStats(tDefStat1, tDefStat2, tDefStat3, 155);
+            RenderStats(agiStat1, agiStat2, agiStat3, 174);
+            RenderStats(luckStat1, luckStat2, luckStat3, 193);
+
+            //Up and down arrows render
+            if (player.statSelected) {
+                // Get confirm button bitmap
+                ID2D1Bitmap* arrows = pBitmaps[Focused_Level_Up_Down_Arrow];
+
+                // Render confirm button
+                if (arrows)
+                {
+                    D2D1_SIZE_F size = arrows->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (177 * scalerX), yArrowOffset * scalerY,
+                        ((leftBorder + (177 * scalerX))) + (size.width * scalerX), ((size.height + yArrowOffset) * scalerY));
+                    pRenderTarget->DrawBitmap(arrows, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+            }
+
             // Get back button bitmap
-            ID2D1Bitmap* backButtonBitmap = pBitmaps[Level_Up_Back_Button_Unpressed];
+            ID2D1Bitmap* backButtonBitmap;
+            LPCWSTR filename = player.lastBackButtonFile;
+            if (player.statSelection == 9 &&
+                (std::chrono::steady_clock::now() - player.backButtonAnimationInterval > std::chrono::milliseconds(500)))
+            {
+                player.backButtonAnimationInterval = std::chrono::steady_clock::now();
+                if (player.lastBackButtonFile == Level_Up_Back_Button_Unpressed) {
+                    filename = Level_Up_Back_Button_Pressed;
+                    player.lastBackButtonFile = Level_Up_Back_Button_Pressed;
+                }
+                else {
+                    filename = Level_Up_Back_Button_Unpressed;
+                    player.lastBackButtonFile = Level_Up_Back_Button_Unpressed;
+                }
+            }
+            if (player.statSelection != 9) {
+                filename = Level_Up_Back_Button_Unpressed;
+                player.lastBackButtonFile = Level_Up_Back_Button_Unpressed;
+            }
+
+            backButtonBitmap = pBitmaps[filename];
 
             // Render back button
             if (backButtonBitmap)
             {
+                
                 D2D1_SIZE_F size = backButtonBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (84 * scalerX), 207 * scalerY,
                     ((leftBorder + (84 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
@@ -2029,63 +2339,6 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                     ((leftBorder + (135 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
                 pRenderTarget->DrawBitmap(confirmButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
-
-            // Get stats bitmap
-            ID2D1Bitmap* strStat1;
-            ID2D1Bitmap* strStat2;
-            ID2D1Bitmap* strStat3;
-            TranslateStatstoBitmap(player.strength, strStat1, strStat2, strStat3);
-
-            ID2D1Bitmap* dexStat1;
-            ID2D1Bitmap* dexStat2;
-            ID2D1Bitmap* dexStat3;
-            TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3);
-
-            ID2D1Bitmap* intStat1;
-            ID2D1Bitmap* intStat2;
-            ID2D1Bitmap* intStat3;
-            TranslateStatstoBitmap(player.intelligence, intStat1, intStat2, intStat3);
-
-            ID2D1Bitmap* wisStat1;
-            ID2D1Bitmap* wisStat2;
-            ID2D1Bitmap* wisStat3;
-            TranslateStatstoBitmap(player.wisdom, wisStat1, wisStat2, wisStat3);
-
-            ID2D1Bitmap* defStat1;
-            ID2D1Bitmap* defStat2;
-            ID2D1Bitmap* defStat3;
-            TranslateStatstoBitmap(player.defense, defStat1, defStat2, defStat3);
-
-            ID2D1Bitmap* mDefStat1;
-            ID2D1Bitmap* mDefStat2;
-            ID2D1Bitmap* mDefStat3;
-            TranslateStatstoBitmap(player.magicDefense, mDefStat1, mDefStat2, mDefStat3);
-
-            ID2D1Bitmap* tDefStat1;
-            ID2D1Bitmap* tDefStat2;
-            ID2D1Bitmap* tDefStat3;
-            TranslateStatstoBitmap(player.trueDefense, tDefStat1, tDefStat2, tDefStat3);
-
-            ID2D1Bitmap* agiStat1;
-            ID2D1Bitmap* agiStat2;
-            ID2D1Bitmap* agiStat3;
-            TranslateStatstoBitmap(player.agility, agiStat1, agiStat2, agiStat3);
-
-            ID2D1Bitmap* luckStat1;
-            ID2D1Bitmap* luckStat2;
-            ID2D1Bitmap* luckStat3;
-            TranslateStatstoBitmap(player.luck, luckStat1, luckStat2, luckStat3);
-
-            // Render stats
-            RenderStats(strStat1, strStat2, strStat3, 41);
-            RenderStats(dexStat1, dexStat2, dexStat3, 60);
-            RenderStats(intStat1, intStat2, intStat3, 79);
-            RenderStats(wisStat1, wisStat2, wisStat3, 98);
-            RenderStats(defStat1, defStat2, defStat3, 117);
-            RenderStats(mDefStat1, mDefStat2, mDefStat3, 136);
-            RenderStats(tDefStat1, tDefStat2, tDefStat3, 155);
-            RenderStats(agiStat1, agiStat2, agiStat3, 174);
-            RenderStats(luckStat1, luckStat2, luckStat3, 193);
             
 
             //// Get confirm bitmap
@@ -2150,7 +2403,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 std::vector<LPCWSTR> spriteData;
 Player player;
 Enemy leafEnemy[10];
-std::vector<Enemy> enemies;
+std::vector<Enemy> enemies; 
+int startingStats[9];
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
@@ -2281,7 +2535,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now();
         std::chrono::duration<float> elapsedTime = currentFrameTime - lastMoveTime;
 
-        if (player.inLevelUpSequence == false) {
+        if (!player.inLevelUpSequence) {
             // Enemy Movement and Animations
             for (int i = 0; i < enemies.size(); i++)
             {
@@ -2332,6 +2586,109 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (player.inLevelUpFanfare) {
                 if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
                     player.inLevelUpFanfare = false;
+                }
+                startingStats[0] = player.strength;
+                startingStats[1] = player.dexterity;
+                startingStats[2] = player.intelligence;
+                startingStats[3] = player.wisdom;
+                startingStats[4] = player.defense;
+                startingStats[5] = player.magicDefense;
+                startingStats[6] = player.trueDefense;
+                startingStats[7] = player.agility;
+                startingStats[8] = player.luck;
+
+            }
+            else {
+                if ((std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
+                {
+                    if (!player.statSelected)
+                    {
+                        if (keys.down) {
+                            player.statSelection = min(player.statSelection + 1, 9);
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                        }
+                        if (keys.up) {
+                            player.statSelection = max(player.statSelection - 1, 0);
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                        }
+                    }
+                    if (keys.space) {
+                        player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                        if (player.statSelected == false) {
+                            player.statSelected = true;
+                        }
+                        else {
+                            player.statSelected = false;
+                        }
+                    }
+                    if (player.statSelected) {
+                        if (keys.up) {
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                            switch (player.statSelection)
+                            {
+                            case 0:
+                                player.strength = min(player.strength + 1, 999);
+                                break;
+                            case 1:
+                                player.dexterity = min(player.dexterity + 1, 999);
+                                break;
+                            case 2:
+                                player.intelligence = min(player.intelligence + 1, 999);
+                                break;
+                            case 3:
+                                player.wisdom = min(player.wisdom + 1, 999);
+                                break;
+                            case 4:
+                                player.defense = min(player.defense + 1, 999);
+                                break;
+                            case 5:
+                                player.magicDefense = min(player.magicDefense + 1, 999);
+                                break;
+                            case 6:
+                                player.trueDefense = min(player.trueDefense + 1, 999);
+                                break;
+                            case 7:
+                                player.agility = min(player.agility + 1, 999);
+                                break;
+                            case 8:
+                                player.luck = min(player.luck + 1, 999);
+                                break;
+                            }
+                        }
+                        if (keys.down) {
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                            switch (player.statSelection)
+                            {
+                            case 0:
+                                player.strength = max(player.strength - 1, startingStats[player.statSelection]);
+                                break;
+                            case 1:
+                                player.dexterity = max(player.dexterity - 1, startingStats[player.statSelection]);
+                                break;
+                            case 2:
+                                player.intelligence = max(player.intelligence - 1, startingStats[player.statSelection]);
+                                break;
+                            case 3:
+                                player.wisdom = max(player.wisdom - 1, startingStats[player.statSelection]);
+                                break;
+                            case 4:
+                                player.defense = max(player.defense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 5:
+                                player.magicDefense = max(player.magicDefense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 6:
+                                player.trueDefense = max(player.trueDefense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 7:
+                                player.agility = max(player.agility - 1, startingStats[player.statSelection]);
+                                break;
+                            case 8:
+                                player.luck = max(player.luck - 1, startingStats[player.statSelection]);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
