@@ -1,0 +1,6 @@
+1. double-click "Research"
+
+
+Arrow keys: 	Move
+Space:		Attack
+Shift:		Sprint
