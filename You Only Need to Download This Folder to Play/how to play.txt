@@ -1,4 +1,4 @@
-1. double-click "Research"
+1. double-click "Research.exe"
 
 
 Arrow keys: 	Move
