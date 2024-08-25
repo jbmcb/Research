@@ -179,6 +179,7 @@ struct
     bool space = false;
     bool lShift = false;
     bool escape = false;
+    std::string lastKeyPressed;
 } keys;
 
 
@@ -751,12 +752,12 @@ public:
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
             lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack2
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 2)
         {
             refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
             SwapAttackFrames(playerStationaryUpBasicAttack3, playerStationaryUpBasicAttack2, testSwordBasicAttackUp3);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -769,13 +770,12 @@ public:
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack3
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 2)
         {
             refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
             SwapAttackFrames(playerStationaryUpBasicAttack4, playerStationaryUpBasicAttack3, testSwordBasicAttackUp4);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -788,13 +788,12 @@ public:
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack4
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 2)
         {
             refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
             SwapAttackFrames(playerStationaryUpBasicAttack5, playerStationaryUpBasicAttack4, testSwordBasicAttackUp5);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -807,13 +806,12 @@ public:
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack5
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 2)
         {
             refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
             SwapAttackFrames(playerStationaryUpBasicAttack6, playerStationaryUpBasicAttack5, testSwordBasicAttackUp6);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -826,13 +824,12 @@ public:
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack6
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 1))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 2))
         {
             refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
             SwapAttackFrames(playerStationaryUpBasicAttack7, playerStationaryUpBasicAttack6, testSwordBasicAttackUp7);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -845,13 +842,12 @@ public:
             SetHitBox();
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack7
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 1))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 2))
             {
                 refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
+                lastBasicAttackFrame = std::chrono::steady_clock::now();
                 SwapAttackFrames(playerStationaryUpBasicAttack8, playerStationaryUpBasicAttack7, testSwordBasicAttackUp8);
 
                 ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -864,9 +860,7 @@ public:
                 SetHitBox();
                 SetPlayerHurtBox();
                 basicAttackFrameThresholds += 1;
-                lastBasicAttackFrame = std::chrono::steady_clock::now();
-                hitLag = std::chrono::nanoseconds(0);
-                }
+             }
         else if (lastfilepath == playerStationaryUpBasicAttack8
             && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 7))
             && keys.space == false)
@@ -882,7 +876,6 @@ public:
             SetPlayerHurtBox();
             basicAttackFrameThresholds = 1;
             lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
             for (int i = 0; i < enemies.size(); i++)
             {
                 enemies.at(i).alreadyHit = false;
@@ -899,7 +892,7 @@ public:
             isBasicAttacking = false;
         }
 
-        if (true)
+        if (isBasicAttacking)
         {
             for (int i = 0; i < enemies.size(); i++)
             {
@@ -2544,7 +2537,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     case WM_DISPLAYCHANGE:
     {
-
         if (!player.inLevelUpSequence) {
             // Enemy Movement and Animations
             for (int i = 0; i < enemies.size(); i++)
@@ -2593,120 +2585,142 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 player.PlayerLevelUpSequence();
             }
         }
-        else 
+        else
         {
-                if (player.inLevelUpFanfare) {
-                    if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
-                        player.inLevelUpFanfare = false;
-                    }
-                    startingStats[0] = player.strength;
-                    startingStats[1] = player.dexterity;
-                    startingStats[2] = player.intelligence;
-                    startingStats[3] = player.wisdom;
-                    startingStats[4] = player.defense;
-                    startingStats[5] = player.magicDefense;
-                    startingStats[6] = player.trueDefense;
-                    startingStats[7] = player.agility;
-                    startingStats[8] = player.luck;
+             if (player.inLevelUpFanfare) {
+                if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
+                    player.inLevelUpFanfare = false;
+                }
+                startingStats[0] = player.strength;
+                startingStats[1] = player.dexterity;
+                startingStats[2] = player.intelligence;
+                startingStats[3] = player.wisdom;
+                startingStats[4] = player.defense;
+                startingStats[5] = player.magicDefense;
+                startingStats[6] = player.trueDefense;
+                startingStats[7] = player.agility;
+                startingStats[8] = player.luck;
 
-                }
-                else {
-                    if ((!keys.space && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
-                        || (keys.space && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(300)))
-                        || ((player.statSelected && !keys.space) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection > std::chrono::milliseconds(150)))
-                        || ((player.statSelected && !keys.space) && ()
+            }
+            else 
+            {
+                if ((!player.statSelected && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
+                    || ((keys.space && player.statSelected) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(300)))
+                    || ((player.statSelected && !keys.space) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection > std::chrono::milliseconds(150)))
+                    || ((keys.lastKeyPressed == "down" || keys.lastKeyPressed == "up") && 
+                            ((std::chrono::steady_clock::now() - player.timeIncrementingNumberwasHeld >= std::chrono::seconds(1)) && 
+                                (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(50))))
+                    || ((keys.lastKeyPressed == "down" || keys.lastKeyPressed == "up") &&
+                        ((std::chrono::steady_clock::now() - player.timeIncrementingNumberwasHeld >= std::chrono::seconds(3)) &&
+                            (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(25))))
+                    || ((keys.lastKeyPressed == "down" || keys.lastKeyPressed == "up") &&
+                        ((std::chrono::steady_clock::now() - player.timeIncrementingNumberwasHeld >= std::chrono::seconds(10)) &&
+                            (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(8)))))
+                {
+                    if (!player.statSelected)
                     {
-                        if (!player.statSelected)
-                        {
-                            if (keys.down) {
-                                player.statSelection = min(player.statSelection + 1, 9);
-                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                            }
-                            if (keys.up) {
-                                player.statSelection = max(player.statSelection - 1, 0);
-                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                            }
-                        }
-                        if (keys.space) {
+                        if (keys.down) {
+                            player.statSelection = min(player.statSelection + 1, 9);
                             player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                            if (player.statSelected == false) {
-                                player.statSelected = true;
+                        }
+                        if (keys.up) {
+                            player.statSelection = max(player.statSelection - 1, 0);
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                        }
+                    }
+                    if (keys.space) {
+                        player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                        if (player.statSelected == false) {
+                            player.statSelected = true;
+                        }
+                        else {
+                            player.statSelected = false;
+                        }
+                    }
+                    if (player.statSelected) {
+                        if (keys.up) {
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                            if (keys.lastKeyPressed != "up")
+                            {
+                                player.timeIncrementingNumberwasHeld = std::chrono::steady_clock::now();
                             }
-                            else {
-                                player.statSelected = false;
+                            keys.lastKeyPressed = "up";
+                            switch (player.statSelection)
+                            {
+                            case 0:
+                                player.strength = min(player.strength + 1, 999);
+                                break;
+                            case 1:
+                                player.dexterity = min(player.dexterity + 1, 999);
+                                break;
+                            case 2:
+                                player.intelligence = min(player.intelligence + 1, 999);
+                                break;
+                            case 3:
+                                player.wisdom = min(player.wisdom + 1, 999);
+                                break;
+                            case 4:
+                                player.defense = min(player.defense + 1, 999);
+                                break;
+                            case 5:
+                                player.magicDefense = min(player.magicDefense + 1, 999);
+                                break;
+                            case 6:
+                                player.trueDefense = min(player.trueDefense + 1, 999);
+                                break;
+                            case 7:
+                                player.agility = min(player.agility + 1, 999);
+                                break;
+                            case 8:
+                                player.luck = min(player.luck + 1, 999);
+                                break;
                             }
                         }
-                        if (player.statSelected) {
-                            if (keys.up) {
-                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                                switch (player.statSelection)
-                                {
-                                case 0:
-                                    player.strength = min(player.strength + 1, 999);
-                                    break;
-                                case 1:
-                                    player.dexterity = min(player.dexterity + 1, 999);
-                                    break;
-                                case 2:
-                                    player.intelligence = min(player.intelligence + 1, 999);
-                                    break;
-                                case 3:
-                                    player.wisdom = min(player.wisdom + 1, 999);
-                                    break;
-                                case 4:
-                                    player.defense = min(player.defense + 1, 999);
-                                    break;
-                                case 5:
-                                    player.magicDefense = min(player.magicDefense + 1, 999);
-                                    break;
-                                case 6:
-                                    player.trueDefense = min(player.trueDefense + 1, 999);
-                                    break;
-                                case 7:
-                                    player.agility = min(player.agility + 1, 999);
-                                    break;
-                                case 8:
-                                    player.luck = min(player.luck + 1, 999);
-                                    break;
-                                }
+                        if (keys.down) {
+                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                            if (keys.lastKeyPressed != "down") 
+                            {
+                                player.timeIncrementingNumberwasHeld = std::chrono::steady_clock::now();
                             }
-                            if (keys.down) {
-                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                                switch (player.statSelection)
-                                {
-                                case 0:
-                                    player.strength = max(player.strength - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 1:
-                                    player.dexterity = max(player.dexterity - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 2:
-                                    player.intelligence = max(player.intelligence - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 3:
-                                    player.wisdom = max(player.wisdom - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 4:
-                                    player.defense = max(player.defense - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 5:
-                                    player.magicDefense = max(player.magicDefense - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 6:
-                                    player.trueDefense = max(player.trueDefense - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 7:
-                                    player.agility = max(player.agility - 1, startingStats[player.statSelection]);
-                                    break;
-                                case 8:
-                                    player.luck = max(player.luck - 1, startingStats[player.statSelection]);
-                                    break;
-                                }
+                            keys.lastKeyPressed = "down";
+                            switch (player.statSelection)
+                            {
+                            case 0:
+                                player.strength = max(player.strength - 1, startingStats[player.statSelection]);
+                                break;
+                            case 1:
+                                player.dexterity = max(player.dexterity - 1, startingStats[player.statSelection]);
+                                break;
+                            case 2:
+                                player.intelligence = max(player.intelligence - 1, startingStats[player.statSelection]);
+                                break;
+                            case 3:
+                                player.wisdom = max(player.wisdom - 1, startingStats[player.statSelection]);
+                                break;
+                            case 4:
+                                player.defense = max(player.defense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 5:
+                                player.magicDefense = max(player.magicDefense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 6:
+                                player.trueDefense = max(player.trueDefense - 1, startingStats[player.statSelection]);
+                                break;
+                            case 7:
+                                player.agility = max(player.agility - 1, startingStats[player.statSelection]);
+                                break;
+                            case 8:
+                                player.luck = max(player.luck - 1, startingStats[player.statSelection]);
+                                break;
                             }
+                        }
+                        if (!keys.up && !keys.down) 
+                        {
+                            keys.lastKeyPressed = "";
                         }
                     }
                 }
-            
+            }
         }
 
         PAINTSTRUCT ps;
