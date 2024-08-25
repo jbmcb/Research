@@ -354,6 +354,8 @@ public:
     int agility = 122;
     int luck = 999;
 
+    std::vector<std::chrono::nanoseconds> refreshTimes;
+
     int statSelection = 0;
     std::chrono::steady_clock::time_point timeSinceLastStatSelection = std::chrono::steady_clock::now();
     bool statSelected = false;
@@ -361,10 +363,11 @@ public:
     LPCWSTR lastBackButtonFile = Level_Up_Back_Button_Unpressed;
     std::chrono::steady_clock::time_point confirmButtonAnimationInterval = std::chrono::steady_clock::now();
     LPCWSTR lastConfirmButtonFile = Level_Up_Confirm_Button_Unpressed;
+    std::chrono::steady_clock::time_point timeIncrementingNumberwasHeld = std::chrono::steady_clock::now();
     
     // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
-    std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::nanoseconds(16666666 / 32);
+    std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::nanoseconds(16666666);
     std::chrono::nanoseconds basicAttackStartLag = std::chrono::nanoseconds(66666666);
     std::chrono::nanoseconds basicAttackEndLag = std::chrono::nanoseconds(133333333);
     std::chrono::nanoseconds hitLag = std::chrono::nanoseconds(0);
@@ -715,7 +718,7 @@ public:
 
         }
         else if (lastfilepath == playerStationaryUpBasicAttack0
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 50))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 3))
         {
             SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUpBasicAttack0, testSwordBasicAttackUp1);
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -733,7 +736,7 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack1
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 0))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements * 2))
         {
             SwapAttackFrames(playerStationaryUpBasicAttack2, playerStationaryUpBasicAttack1, testSwordBasicAttackUp2);
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -751,8 +754,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack2
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
         {
+            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
             SwapAttackFrames(playerStationaryUpBasicAttack3, playerStationaryUpBasicAttack2, testSwordBasicAttackUp3);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -769,8 +773,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack3
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
         {
+            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
             SwapAttackFrames(playerStationaryUpBasicAttack4, playerStationaryUpBasicAttack3, testSwordBasicAttackUp4);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -787,8 +792,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack4
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
         {
+            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
             SwapAttackFrames(playerStationaryUpBasicAttack5, playerStationaryUpBasicAttack4, testSwordBasicAttackUp5);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -805,8 +811,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack5
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 0)
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements * 1)
         {
+            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
             SwapAttackFrames(playerStationaryUpBasicAttack6, playerStationaryUpBasicAttack5, testSwordBasicAttackUp6);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -823,8 +830,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack6
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 0))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 1))
         {
+            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
             SwapAttackFrames(playerStationaryUpBasicAttack7, playerStationaryUpBasicAttack6, testSwordBasicAttackUp7);
 
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -841,8 +849,9 @@ public:
             hitLag = std::chrono::nanoseconds(0);
         }
         else if (lastfilepath == playerStationaryUpBasicAttack7
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 0))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements * 1))
             {
+                refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
                 SwapAttackFrames(playerStationaryUpBasicAttack8, playerStationaryUpBasicAttack7, testSwordBasicAttackUp8);
 
                 ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -859,10 +868,9 @@ public:
                 hitLag = std::chrono::nanoseconds(0);
                 }
         else if (lastfilepath == playerStationaryUpBasicAttack8
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 300))
+            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 7))
             && keys.space == false)
         {
-
             fileName = playerStationaryUp;
             lastfilepath = fileName;
             secondlastfilepath = nullptr;
@@ -903,7 +911,7 @@ public:
                         /*enemies.at(i).damageTaken = true;*/
                         enemies.at(i).alreadyHit = true;
                         enemies.at(i).inHitstun = true;
-                        enemies.at(i).hp -= strength;
+                        enemies.at(i).hp -= 10;
                         /*double nanoseconds = (static_cast<double>(attack) / static_cast<double>(enemies.at(i).maxHP)) * 333333333;
                         hitLag = std::chrono::nanoseconds((static_cast<int>(nanoseconds)));*/
 
@@ -967,7 +975,7 @@ public:
     }
 };*/
 
-void ApplyPlayerDirectionalInput(Player& player, std::chrono::duration<float> elapsedTime, std::chrono::steady_clock::time_point currentFrameTime, double xDir, double yDir)
+void ApplyPlayerDirectionalInput(Player& player, std::chrono::steady_clock::time_point currentFrameTime, double xDir, double yDir)
 {
     if ((xDir != 0 || yDir != 0) && (player.hurtbox.left + xDir) >= leftBorder && player.hurtbox.top >= 0
         && player.hurtbox.right <= rightBorder && player.hurtbox.bottom <= sysScreenY)
@@ -1323,6 +1331,7 @@ void CreateDeviceResources(HWND hWnd, std::vector<LPCWSTR> spriteData)
         return;
     }
 
+    int j = 0;
     // Iterating over each file in the sprite container
     for (int i = 0; i < spriteData.size(); i++)
     {
@@ -1373,6 +1382,7 @@ void CreateDeviceResources(HWND hWnd, std::vector<LPCWSTR> spriteData)
 
         if (SUCCEEDED(hr))
         {
+            j++;
             pBitmaps[spriteData.at(i)] = pBitmap;
         }
 
@@ -2405,6 +2415,8 @@ Player player;
 Enemy leafEnemy[10];
 std::vector<Enemy> enemies; 
 int startingStats[9];
+std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
+std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 {
@@ -2532,8 +2544,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     case WM_DISPLAYCHANGE:
     {
-        std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now();
-        std::chrono::duration<float> elapsedTime = currentFrameTime - lastMoveTime;
 
         if (!player.inLevelUpSequence) {
             // Enemy Movement and Animations
@@ -2545,7 +2555,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     leafXDir /= 100;
                     double leafYDir = ((rand() % 200)) - 100;
                     leafYDir /= 100;
-                    ApplyEnemyDirectionalInput(enemies.at(i), 2 * leafXDir, 2 * leafYDir);
+                    ApplyEnemyDirectionalInput(enemies.at(i), 4.8 * leafXDir, 4.8 * leafYDir);
                 }
                 else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
                 {
@@ -2558,8 +2568,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (keys.space == false && player.isBasicAttacking == false)
             {
                 GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
-                xDir *= 2;
-                yDir *= 2;
+                xDir *= 4.8;
+                yDir *= 4.8;
                 if (keys.lShift == true)
                 {
                     xDir *= 1.4;
@@ -2570,8 +2580,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
                 }
-                ApplyPlayerDirectionalInput(player, elapsedTime, currentFrameTime, xDir, yDir);
+                ApplyPlayerDirectionalInput(player, currentFrameTime, xDir, yDir);
             }
+
 
             else if (keys.space == true || player.isBasicAttacking == true)
             {
@@ -2582,115 +2593,120 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 player.PlayerLevelUpSequence();
             }
         }
-        else {
-            if (player.inLevelUpFanfare) {
-                if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
-                    player.inLevelUpFanfare = false;
-                }
-                startingStats[0] = player.strength;
-                startingStats[1] = player.dexterity;
-                startingStats[2] = player.intelligence;
-                startingStats[3] = player.wisdom;
-                startingStats[4] = player.defense;
-                startingStats[5] = player.magicDefense;
-                startingStats[6] = player.trueDefense;
-                startingStats[7] = player.agility;
-                startingStats[8] = player.luck;
+        else 
+        {
+                if (player.inLevelUpFanfare) {
+                    if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
+                        player.inLevelUpFanfare = false;
+                    }
+                    startingStats[0] = player.strength;
+                    startingStats[1] = player.dexterity;
+                    startingStats[2] = player.intelligence;
+                    startingStats[3] = player.wisdom;
+                    startingStats[4] = player.defense;
+                    startingStats[5] = player.magicDefense;
+                    startingStats[6] = player.trueDefense;
+                    startingStats[7] = player.agility;
+                    startingStats[8] = player.luck;
 
-            }
-            else {
-                if ((std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
-                {
-                    if (!player.statSelected)
+                }
+                else {
+                    if ((!keys.space && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
+                        || (keys.space && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(300)))
+                        || ((player.statSelected && !keys.space) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection > std::chrono::milliseconds(150)))
+                        || ((player.statSelected && !keys.space) && ()
                     {
-                        if (keys.down) {
-                            player.statSelection = min(player.statSelection + 1, 9);
-                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                        }
-                        if (keys.up) {
-                            player.statSelection = max(player.statSelection - 1, 0);
-                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                        }
-                    }
-                    if (keys.space) {
-                        player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                        if (player.statSelected == false) {
-                            player.statSelected = true;
-                        }
-                        else {
-                            player.statSelected = false;
-                        }
-                    }
-                    if (player.statSelected) {
-                        if (keys.up) {
-                            player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                            switch (player.statSelection)
-                            {
-                            case 0:
-                                player.strength = min(player.strength + 1, 999);
-                                break;
-                            case 1:
-                                player.dexterity = min(player.dexterity + 1, 999);
-                                break;
-                            case 2:
-                                player.intelligence = min(player.intelligence + 1, 999);
-                                break;
-                            case 3:
-                                player.wisdom = min(player.wisdom + 1, 999);
-                                break;
-                            case 4:
-                                player.defense = min(player.defense + 1, 999);
-                                break;
-                            case 5:
-                                player.magicDefense = min(player.magicDefense + 1, 999);
-                                break;
-                            case 6:
-                                player.trueDefense = min(player.trueDefense + 1, 999);
-                                break;
-                            case 7:
-                                player.agility = min(player.agility + 1, 999);
-                                break;
-                            case 8:
-                                player.luck = min(player.luck + 1, 999);
-                                break;
+                        if (!player.statSelected)
+                        {
+                            if (keys.down) {
+                                player.statSelection = min(player.statSelection + 1, 9);
+                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                            }
+                            if (keys.up) {
+                                player.statSelection = max(player.statSelection - 1, 0);
+                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
                             }
                         }
-                        if (keys.down) {
+                        if (keys.space) {
                             player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
-                            switch (player.statSelection)
-                            {
-                            case 0:
-                                player.strength = max(player.strength - 1, startingStats[player.statSelection]);
-                                break;
-                            case 1:
-                                player.dexterity = max(player.dexterity - 1, startingStats[player.statSelection]);
-                                break;
-                            case 2:
-                                player.intelligence = max(player.intelligence - 1, startingStats[player.statSelection]);
-                                break;
-                            case 3:
-                                player.wisdom = max(player.wisdom - 1, startingStats[player.statSelection]);
-                                break;
-                            case 4:
-                                player.defense = max(player.defense - 1, startingStats[player.statSelection]);
-                                break;
-                            case 5:
-                                player.magicDefense = max(player.magicDefense - 1, startingStats[player.statSelection]);
-                                break;
-                            case 6:
-                                player.trueDefense = max(player.trueDefense - 1, startingStats[player.statSelection]);
-                                break;
-                            case 7:
-                                player.agility = max(player.agility - 1, startingStats[player.statSelection]);
-                                break;
-                            case 8:
-                                player.luck = max(player.luck - 1, startingStats[player.statSelection]);
-                                break;
+                            if (player.statSelected == false) {
+                                player.statSelected = true;
+                            }
+                            else {
+                                player.statSelected = false;
+                            }
+                        }
+                        if (player.statSelected) {
+                            if (keys.up) {
+                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                                switch (player.statSelection)
+                                {
+                                case 0:
+                                    player.strength = min(player.strength + 1, 999);
+                                    break;
+                                case 1:
+                                    player.dexterity = min(player.dexterity + 1, 999);
+                                    break;
+                                case 2:
+                                    player.intelligence = min(player.intelligence + 1, 999);
+                                    break;
+                                case 3:
+                                    player.wisdom = min(player.wisdom + 1, 999);
+                                    break;
+                                case 4:
+                                    player.defense = min(player.defense + 1, 999);
+                                    break;
+                                case 5:
+                                    player.magicDefense = min(player.magicDefense + 1, 999);
+                                    break;
+                                case 6:
+                                    player.trueDefense = min(player.trueDefense + 1, 999);
+                                    break;
+                                case 7:
+                                    player.agility = min(player.agility + 1, 999);
+                                    break;
+                                case 8:
+                                    player.luck = min(player.luck + 1, 999);
+                                    break;
+                                }
+                            }
+                            if (keys.down) {
+                                player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
+                                switch (player.statSelection)
+                                {
+                                case 0:
+                                    player.strength = max(player.strength - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 1:
+                                    player.dexterity = max(player.dexterity - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 2:
+                                    player.intelligence = max(player.intelligence - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 3:
+                                    player.wisdom = max(player.wisdom - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 4:
+                                    player.defense = max(player.defense - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 5:
+                                    player.magicDefense = max(player.magicDefense - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 6:
+                                    player.trueDefense = max(player.trueDefense - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 7:
+                                    player.agility = max(player.agility - 1, startingStats[player.statSelection]);
+                                    break;
+                                case 8:
+                                    player.luck = max(player.luck - 1, startingStats[player.statSelection]);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
+            
         }
 
         PAINTSTRUCT ps;
