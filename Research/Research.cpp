@@ -240,16 +240,24 @@ public:
     bool inHitstun = false;
     std::chrono::nanoseconds hitStunTime;
     std::chrono::steady_clock::time_point hitStunStartTime = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point timeSinceLastMovement = std::chrono::steady_clock::now();
+    std::chrono::milliseconds moveInterval = std::chrono::milliseconds(5000);
+    double xDirection, yDirection;
 
     Enemy()
     {
-        xPosition = rand() % 1920;
-        yPosition = rand() % 1080;
+        xPosition = rand() % int(rightBorder - leftBorder) + leftBorder;
+        yPosition = rand() % sysScreenY;
         fileName = leafEnemyStationary;
         lastfilepath = leafEnemyStationary;
         secondlastfilepath = leafEnemyDownWalkingRight;
         fileNameChanged = true;
         SetEnemyHurtBox();
+        xDirection = (rand() % 200) - 100;
+        yDirection = (rand() % 200) - 100;
+        xDirection /= 100;
+        yDirection /= 100;
+        moveInterval = std::chrono::milliseconds((rand() % 2000) + 1500);
     }
 
     void SetEnemyHurtBox()
@@ -2236,7 +2244,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 std::vector<LPCWSTR> spriteData;
 Player player;
-Enemy leafEnemy[1];
+Enemy leafEnemy[50];
 std::vector<Enemy> enemies; 
 int startingStats[9];
 std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
@@ -2247,7 +2255,18 @@ void UpdateGameLogic(double deltaSeconds) {
         // Enemy Movement and Animations
         for (int i = 0; i < enemies.size(); i++)
         {
-            if (enemies.at(i).framesWalked2 % 288 == 0 && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+            if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime) {
+                if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= enemies.at(i).moveInterval) {
+                    enemies.at(i).timeSinceLastMovement = std::chrono::steady_clock::now();
+                    enemies.at(i).xDirection = (rand() % 200) - 100;
+                    enemies.at(i).yDirection = (rand() % 200) - 100;
+                    enemies.at(i).xDirection /= 100;
+                    enemies.at(i).yDirection /= 100;
+                    enemies.at(i).moveInterval = std::chrono::milliseconds((rand() % 2000) + 1500);
+                }
+                ApplyEnemyDirectionalInput(enemies.at(i), 2 * enemies.at(i).xDirection * deltaSeconds, 2 * enemies.at(i).yDirection * deltaSeconds);
+            }
+            /*if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= std::chrono::seconds(5) && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
             {
                 double leafXDir = ((rand() % 200)) - 100;
                 leafXDir /= 100;
@@ -2258,7 +2277,7 @@ void UpdateGameLogic(double deltaSeconds) {
             else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
             {
                 ApplyEnemyDirectionalInput(enemies.at(i), enemies.at(i).lastXDirection2 * deltaSeconds, enemies.at(i).lastYDirection2 * deltaSeconds);
-            }
+            }*/
         }
 
         // Player Actions, Movement, and Animations
@@ -2447,8 +2466,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 
     std::vector<bool> calendar(365, false);
 
-    enemies.reserve(1);
-    for (int i = 0; i < 0; i++)
+    enemies.reserve(50);
+    for (int i = 0; i < 49; i++)
     {
         enemies.emplace_back(leafEnemy[i]);
     }
