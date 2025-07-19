@@ -118,6 +118,8 @@ LPCWSTR man = L"Sprites\\Enemies\\1.png";
 // Maps of info regarding various enemies
 std::map<const std::string, int> experience;
 
+const float pi = 3.141592;
+
 void populateEnemyExpList() {
     experience["Leafnir"] = 10;
 }
@@ -204,12 +206,14 @@ public:
     LPCWSTR secondlastfilepath = nullptr;
     double lastXDirection = 0;
     double lastYDirection = 0;
+    char lastDirection = 'u';
     std::chrono::steady_clock::time_point lastWalkTime = std::chrono::steady_clock::now();
     int framesWalked2 = 0;
     bool fileNameChanged = false;
     int state = 3;
     int count = 0;
     D2D1_RECT_F hurtbox;
+    float angleDegrees;
 
     double lastXDirection2 = 0;
     double lastYDirection2 = 0;
@@ -224,6 +228,25 @@ public:
     {
         fileName = nullptr;
         fileNameChanged = true;
+    }
+
+    void UpdateGeneralState() {
+        if (lastXDirection >= 1 && lastYDirection == 0) {
+            angleDegrees = 90;
+            lastDirection = 'r';
+        }
+        else if (lastXDirection == 0 && lastYDirection >= 1) {
+            angleDegrees = 180;
+            lastDirection = 'd';
+        }
+        else if (lastXDirection <= -1 && lastYDirection == 0) {
+            angleDegrees = 270;
+            lastDirection = 'l';
+        }
+        else {
+            angleDegrees = 0;
+            lastDirection = 'u';
+        }
     }
 };
 
@@ -378,8 +401,8 @@ public:
     
     // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
-    std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::nanoseconds(16666666);
-    std::chrono::nanoseconds basicAttackStartLag = std::chrono::nanoseconds(66666666);
+    std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::milliseconds(8);
+    std::chrono::nanoseconds basicAttackStartLag = std::chrono::microseconds(8888);
     std::chrono::nanoseconds basicAttackEndLag = std::chrono::nanoseconds(133333333);
     std::chrono::nanoseconds hitLag = std::chrono::nanoseconds(0);
     std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666); 
@@ -709,7 +732,7 @@ public:
 
     void BasicAttack(std::vector<Enemy>& enemies)
     {
-        if (lastfilepath == playerStationaryUp || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight)
+        if (weaponFileName == nullptr)
         {
             SwapAttackFrames(playerStationaryUpBasicAttack0, playerStationaryUp, testSwordBasicAttackUp0);
             ID2D1Bitmap* pBitmap = pBitmaps[fileName];
@@ -724,7 +747,6 @@ public:
             SetPlayerHurtBox();
             basicAttackFrameThresholds += 1;
             lastBasicAttackFrame = std::chrono::steady_clock::now();
-            isBasicAttacking = true;
             hitLag = std::chrono::nanoseconds(0);
 
         }
@@ -1719,9 +1741,13 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         if (playerWeaponFrameBitmap)
         {
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
+            D2D1_POINT_2F midpoint = D2D1::Point2F((player.weaponXPosition + ((size.width * scalerX)/2)), ((player.weaponYPosition + (size.height * scalerY) / 2)));
+            D2D1_MATRIX_3X2_F rotate = D2D1::Matrix3x2F::Rotation(player.angleDegrees, midpoint);
+            pRenderTarget->SetTransform(rotate);
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
                 (size.width * scalerX) + player.weaponXPosition, (size.height * scalerY) + player.weaponYPosition);
             pRenderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
         }
 
         HRESULT hr = S_OK;
@@ -2252,6 +2278,9 @@ std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::no
 
 void UpdateGameLogic(double deltaSeconds) {
     if (!player.inLevelUpSequence) {
+        if (keys.down && !keys.up && !keys.right && !keys.left) {
+            player.UpdateGeneralState();
+        }
         // Enemy Movement and Animations
         for (int i = 0; i < enemies.size(); i++)
         {
@@ -2308,6 +2337,7 @@ void UpdateGameLogic(double deltaSeconds) {
 
         else if (keys.space == true || player.isBasicAttacking == true)
         {
+            player.isBasicAttacking = true;
             player.BasicAttack(enemies);
         }
 
@@ -2467,7 +2497,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     std::vector<bool> calendar(365, false);
 
     enemies.reserve(50);
-    for (int i = 0; i < 49; i++)
+    for (int i = 0; i < 1; i++)
     {
         enemies.emplace_back(leafEnemy[i]);
     }
@@ -2524,15 +2554,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case VK_LEFT:
             keys.left = true;
+            player.lastXDirection -= 1;
             break;
         case VK_RIGHT:
             keys.right = true;
+            player.lastXDirection += 1;
             break;
         case VK_UP:
             keys.up = true;
+            player.lastYDirection -= 1;
             break;
         case VK_DOWN:
             keys.down = true;
+            player.lastYDirection += 1;
             break;
         case VK_SPACE:
             keys.space = true;
@@ -2553,15 +2587,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         case VK_LEFT:
             keys.left = false;
+            player.lastXDirection += 1;
             break;
         case VK_RIGHT:
-            keys.right = false;
+            keys.right = false; 
+            player.lastXDirection -= 1;
             break;
         case VK_UP:
             keys.up = false;
+            player.lastYDirection += 1;
             break;
         case VK_DOWN:
             keys.down = false;
+            player.lastYDirection -= 1;
             break;
         case VK_SPACE:
             keys.space = false;
