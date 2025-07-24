@@ -41,8 +41,10 @@ LPCWSTR playerStationaryUpBasicAttack6 = L"Sprites\\Player\\playerstationaryupba
 LPCWSTR playerStationaryUpBasicAttack7 = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
 LPCWSTR playerStationaryUpBasicAttack8 = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
 LPCWSTR playerLevelUp = L"Sprites\\Player\\playerLevelUp.png";
+LPCWSTR playerBasicAttackR1 = L"Sprites\\Player\\Player_Basic_Attack_R6.png";
 
 // Weapon Sprites
+LPCWSTR testSwordBasicAttack[9];
 LPCWSTR testSwordBasicAttackUp0 = L"Sprites\\Weapons\\testswordbasicattackup0.png";
 LPCWSTR testSwordBasicAttackUp1 = L"Sprites\\Weapons\\testswordbasicattackup1.png";
 LPCWSTR testSwordBasicAttackUp2 = L"Sprites\\Weapons\\testswordbasicattackup2.png";
@@ -65,6 +67,10 @@ LPCWSTR leafEnemyDownHitstun = L"Sprites\\Enemies\\LeafDownHitstun.png";
 // Environment
 LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
 LPCWSTR checkerBackground = L"Sprites\\Environment\\checkerBackground.png";
+LPCWSTR BG_home_f = L"Sprites\\Environment\\Home_Front.png";
+LPCWSTR BG_home_b = L"Sprites\\Environment\\Home_Back.png";
+LPCWSTR BG_home_p1 = L"Sprites\\Environment\\Home_Pathway_1.png";
+LPCWSTR BG_home_p2 = L"Sprites\\Environment\\Home_Pathway_2.png";
 
 // UI
 LPCWSTR hpBarFilling = L"Sprites\\UI\\HP_Bar_Filling.png";
@@ -108,11 +114,6 @@ LPCWSTR Yellow_Stat_Number_7 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_7.png";
 LPCWSTR Yellow_Stat_Number_8 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_8.png";
 LPCWSTR Yellow_Stat_Number_9 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_9.png";
 LPCWSTR UI_Shell = L"Sprites\\UI\\UI_Shell.png";
-
-LPCWSTR BG_home_f = L"Sprites\\Environment\\Home_Front.png";
-LPCWSTR BG_home_b = L"Sprites\\Environment\\Home_Back.png";
-LPCWSTR BG_home_p1 = L"Sprites\\Environment\\Home_Pathway_1.png";
-LPCWSTR BG_home_p2 = L"Sprites\\Environment\\Home_Pathway_2.png";
 
 LPCWSTR small_0 = L"Sprites\\UI\\Fonts\\Small_0.png";
 LPCWSTR small_1 = L"Sprites\\UI\\Fonts\\Small_1.png";
@@ -226,7 +227,7 @@ public:
     int state = 3;
     int count = 0;
     D2D1_RECT_F hurtbox;
-    float angleDegrees;
+    float angleDegrees = 180;
 
     double lastXDirection2 = 0;
     double lastYDirection2 = 0;
@@ -410,8 +411,9 @@ public:
     int trueDefense = 121;
     int agility = 122;
     int luck = 999;
-    char facingDirection = 'u';
+    char facingDirection = 'd';
     __int8 bAttkFrame = -1;
+    unsigned __int8 atkFrames = (sizeof(playerStationaryUpBasicAttack) / sizeof(playerStationaryUpBasicAttack[0])) - 1;
 
     std::vector<std::chrono::nanoseconds> refreshTimes;
 
@@ -423,17 +425,17 @@ public:
     std::chrono::steady_clock::time_point confirmButtonAnimationInterval = std::chrono::steady_clock::now();
     LPCWSTR lastConfirmButtonFile = Level_Up_Confirm_Button_Unpressed;
     std::chrono::steady_clock::time_point timeIncrementingNumberwasHeld = std::chrono::steady_clock::now();
-    
+
     // Player Clocks
     std::chrono::steady_clock::time_point lastBasicAttackFrame = std::chrono::steady_clock::now();
     std::chrono::nanoseconds basicAttackFrameIncrements = std::chrono::milliseconds(8);
     std::chrono::nanoseconds basicAttackStartLag = std::chrono::microseconds(8888);
     std::chrono::nanoseconds basicAttackEndLag = std::chrono::nanoseconds(133333333);
     std::chrono::nanoseconds hitLag = std::chrono::nanoseconds(0);
-    std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666); 
+    std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666);
     std::chrono::steady_clock::time_point lastLevelUpOverworldTextTime;
 
-    
+
     bool isBasicAttacking = false;
     LPCWSTR weaponFileName;
     double weaponXPosition = xPosition;
@@ -450,14 +452,14 @@ public:
     bool lastBobWasZero = true;
 
     float wpnXOff[9] = {
-        (10 / 13), (12 / 13), (12 / 13),
-        (11 / 13), (5 / 13), -(6 / 13),
-        -(15 / 13), -(18 / 13), -(15 / 13) };
-    
+        (10.0 / 13), (12.0 / 13), (12.0 / 13),
+        (11.0 / 13), (5.0 / 13), -(6.0 / 13),
+        -(15.0 / 13), -(18.0 / 13), -(15.0 / 13) };
+
     float wpnYOff[9] = {
-        (13 / 21), (11 / 21), 0,
-        -(10 / 21), -(13 / 21), -(10 / 21),
-        -(6 / 21), (1 / 21), (13 / 21) };
+        (13.0 / 21), (11.0 / 21), 0,
+        -(10.0 / 21), -(13.0 / 21), -(10.0 / 21),
+        -(6.0 / 21), (1.0 / 21), (13.0 / 21) };
 
     Player()
     {
@@ -496,6 +498,7 @@ public:
     void PlayerWalkingDownLogic(double xDirection, double yDirection)
     {
         facingDirection = 'd';
+        angleDegrees = 180;
         if (lastfilepath != playerStationaryDown && lastfilepath != playerWalkingDownLeft && lastfilepath != playerWalkingDownRight)
         {
             frame = playerWalkingDownLeft;
@@ -544,6 +547,7 @@ public:
     void PlayerWalkingUpLogic(double xDirection, double yDirection)
     {
         facingDirection = 'u';
+        angleDegrees = 0;
         if (lastfilepath != playerStationaryUp && lastfilepath != playerWalkingUpLeft && lastfilepath != playerWalkingUpRight)
         {
             frame = playerWalkingUpLeft;
@@ -592,6 +596,7 @@ public:
     void PlayerWalkingLeftLogic(double xDirection, double yDirection)
     {
         facingDirection = 'l';
+        angleDegrees = 270;
         if (lastfilepath != playerStationaryLeft && lastfilepath != playerWalkingLeftLeft && lastfilepath != playerWalkingLeftRight)
         {
             frame = playerWalkingLeftLeft;
@@ -640,6 +645,7 @@ public:
     void PlayerWalkingRightLogic(double xDirection, double yDirection)
     {
         facingDirection = 'r';
+        angleDegrees = 90;
         if (lastfilepath != playerStationaryRight && lastfilepath != playerWalkingRightLeft && lastfilepath != playerWalkingRightRight)
         {
             frame = playerWalkingRightLeft;
@@ -697,7 +703,7 @@ public:
                 || lastfilepath == playerWalkingDownLeft || lastfilepath == playerWalkingDownRight))
             {
                 PlayerWalkingDownLogic(xDirection, yDirection);
-                
+
             }
             else if ((yDirection < 0 && xDirection != 0) && (lastfilepath == playerStationaryUp
                 || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight))
@@ -768,70 +774,81 @@ public:
 
     void SwapPlayerFrames(char facingDirection) {
         lastBasicAttackFrame = std::chrono::steady_clock::now();
-        bAttkFrame++;
+        if (bAttkFrame == -1) {
+            bAttkFrame = 0;
+        }
+        else if (bAttkFrame == atkFrames) {
+            bAttkFrame = -1;
+        }
+        else {
+            bAttkFrame++;
+        }
         secondlastfilepath = frame;
         switch (facingDirection) {
         case 'u':
             frame = playerStationaryUpBasicAttack[bAttkFrame];
             break;
-        /*case 'd':
-        case 'l':
-        case 'r':*/
+        case 'r':
+            frame = playerBasicAttackR1;
+            /*case 'l'
+            case 'd':*/
 
         }
         lastfilepath = frame;
         frameChanged = true;
-        return
+        return;
     }
 
     void BasicAttack(std::vector<Enemy>& enemies)
-    {
-        if (bAttkFrame != 9)
-        {
-            if (bAttkFrame == -1) bAttkFrame = 0;
-            SwapPlayerFrames(facingDirection);
-            weaponFileName = testSwordBasicAttackUp0;
-            ID2D1Bitmap* pBitmap = pBitmaps[frame];
-            if (pBitmap)
+    {   
+        if (std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackFrameIncrements) {
+            lastBasicAttackFrame = std::chrono::steady_clock::now();
+            if (bAttkFrame < atkFrames)
             {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * wpnXOff[bAttkFrame]) * scalerX);
-                weaponYPosition = yPosition + ((size.height * wpnYOff[bAttkFrame]) * scalerY);
+                SwapPlayerFrames(facingDirection);
+                weaponFileName = testSwordBasicAttack[bAttkFrame];
+                ID2D1Bitmap* pBitmap = pBitmaps[frame];
+                if (pBitmap)
+                {
+                    D2D1_SIZE_F size = pBitmap->GetSize();
+                    weaponXPosition = xPosition + ((size.width * wpnXOff[bAttkFrame]) * scalerX);
+                    weaponYPosition = yPosition + ((size.height * wpnYOff[bAttkFrame]) * scalerY);
+                }
+
+                SetHitBox();
+                SetPlayerHurtBox();
             }
-
-            SetHitBox();
-            SetPlayerHurtBox();
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack8
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 3))
-            && keys.space == false)
-        {
-            frame = playerStationaryUp;
-            lastfilepath = frame;
-            secondlastfilepath = nullptr;
-            frameChanged = true;
-            isBasicAttacking = false;
-
-            weaponFileName = nullptr;
-            RemoveHitBox();
-            SetPlayerHurtBox();
-            for (int i = 0; i < enemies.size(); i++)
+            else if (bAttkFrame == atkFrames/* && keys.space == false*/)
             {
-                enemies.at(i).alreadyHit = false;
+                bAttkFrame = -1;
+                switch (facingDirection) {
+                case ('u'):
+                    frame = playerStationaryUp;
+                    break;
+                case ('d'):
+                    frame = playerStationaryDown;
+                    break;
+                case ('l'):
+                    frame = playerStationaryLeft;
+                    break;
+                case ('r'):
+                    frame = playerStationaryRight;
+                    break;
+                }
+                lastfilepath = frame;
+                secondlastfilepath = nullptr;
+                frameChanged = true;
+                weaponFileName = nullptr;
+                RemoveHitBox();
+                SetPlayerHurtBox();
+                for (int i = 0; i < enemies.size(); i++)
+                {
+                    enemies.at(i).alreadyHit = false;
+                }
             }
         }
-        /*if (lastfilepath != playerStationaryUp)
-        {
-            framesBasicAttacked++;
-        }*/
-        if (lastfilepath == playerStationaryDown || lastfilepath == playerWalkingDownLeft || lastfilepath == playerWalkingDownRight
-            || lastfilepath == playerStationaryLeft || lastfilepath == playerWalkingLeftLeft || lastfilepath == playerWalkingLeftRight
-            || lastfilepath == playerStationaryRight || lastfilepath == playerWalkingRightLeft || lastfilepath == playerWalkingRightRight)
-        {
-            isBasicAttacking = false;
-        }
 
-        if (isBasicAttacking)
+        if (bAttkFrame != -1)
         {
             for (int i = 0; i < enemies.size(); i++)
             {
@@ -865,9 +882,6 @@ public:
                     }*/
                 }
             }
-        }
-        else {
-            weaponFileName = nullptr;
         }
 
     }
@@ -1058,6 +1072,7 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(playerStationaryUpBasicAttack6);
     spriteData.emplace_back(playerStationaryUpBasicAttack7);
     spriteData.emplace_back(playerStationaryUpBasicAttack8);
+    spriteData.emplace_back(playerBasicAttackR1);
 
     // player weapon animations
     spriteData.emplace_back(testSwordBasicAttackUp0);
@@ -1606,7 +1621,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 std::vector<LPCWSTR> spriteData;
 Player player;
 Enemy leafEnemy[50];
-std::vector<Enemy> enemies; 
+std::vector<Enemy> enemies;
 int startingStats[9];
 std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
 std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
@@ -1616,8 +1631,6 @@ unsigned __int8 currentEnvID(1);
 
 void Render(HWND hWnd)
 {
-
-
     if (pRenderTarget)
     {
         pRenderTarget->BeginDraw();
@@ -1707,8 +1720,10 @@ void Render(HWND hWnd)
         // Render weapon
         if (playerWeaponFrameBitmap)
         {
+
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
-            D2D1_POINT_2F midpoint = D2D1::Point2F((player.weaponXPosition + ((size.width * scalerX) / 2)), ((player.weaponYPosition + (size.height * scalerY) / 2)));
+            D2D1_SIZE_F playerSize = playerFrameBitmap->GetSize();
+            D2D1_POINT_2F midpoint = D2D1::Point2F((player.xPosition + ((playerSize.width * scalerX) / 2)), (player.yPosition + (playerSize.height * scalerY) / 2));
             D2D1_MATRIX_3X2_F rotate = D2D1::Matrix3x2F::Rotation(player.angleDegrees, midpoint);
             pRenderTarget->SetTransform(rotate);
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
@@ -2232,7 +2247,7 @@ void UpdateGameLogic(double deltaSeconds) {
 
         // Player Actions, Movement, and Animations
         double xDir, yDir;
-        if (keys.space == false && player.isBasicAttacking == false)
+        if (keys.space == false && player.bAttkFrame == -1)
         {
             GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
             if ((xDir != 0 || yDir != 0)) {
@@ -2256,7 +2271,7 @@ void UpdateGameLogic(double deltaSeconds) {
         }
 
 
-        else if (keys.space == true || player.isBasicAttacking == true)
+        else if ((keys.space == true && player.bAttkFrame == -1) || player.bAttkFrame != -1)
         {
             player.BasicAttack(enemies);
         }
@@ -2415,6 +2430,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     playerStationaryUpBasicAttack[6] = L"Sprites\\Player\\playerstationaryupbasicattack6.png";
     playerStationaryUpBasicAttack[7] = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
     playerStationaryUpBasicAttack[8] = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
+
+    testSwordBasicAttack[0] = L"Sprites\\Weapons\\testswordbasicattackup0.png";
+    testSwordBasicAttack[1] = L"Sprites\\Weapons\\testswordbasicattackup1.png";
+    testSwordBasicAttack[2] = L"Sprites\\Weapons\\testswordbasicattackup2.png";
+    testSwordBasicAttack[3] = L"Sprites\\Weapons\\testswordbasicattackup3.png";
+    testSwordBasicAttack[4] = L"Sprites\\Weapons\\testswordbasicattackup4.png";
+    testSwordBasicAttack[5] = L"Sprites\\Weapons\\testswordbasicattackup5.png";
+    testSwordBasicAttack[6] = L"Sprites\\Weapons\\testswordbasicattackup6.png";
+    testSwordBasicAttack[7] = L"Sprites\\Weapons\\testswordbasicattackup7.png";
+    testSwordBasicAttack[8] = L"Sprites\\Weapons\\testswordbasicattackup8.png";
     srand(time(NULL));
 
     // Load all Sprites
@@ -2425,8 +2450,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 
     environments.emplace_back(BG_home_f, environments.size() + 1);
     environments.back().AddDoor(40, 104, 0, 1, 72, 202, 2);
+    environments.back().AddDoor(40, 255, 223, 224, 148, 1, 3);
+
     environments.emplace_back(BG_home_b, environments.size() + 1);
     environments.back().AddDoor(40, 104, 223, 224, 72, 1, 1);
+    
+    environments.emplace_back(BG_home_p1, environments.size() + 1);
+    environments.back().AddDoor(40, 255, 0, 1, 148, 202, 1);
+    environments.back().AddDoor(40, 255, 223, 224, 148, 1, 4);
+
+    environments.emplace_back(BG_home_p2, environments.size() + 1);
+    environments.back().AddDoor(40, 255, 0, 1, 148, 202, 3);
 
     std::vector<bool> calendar(365, false);
 
