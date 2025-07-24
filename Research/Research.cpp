@@ -30,6 +30,7 @@ LPCWSTR playerStationaryRight = L"Sprites\\Player\\playerstationaryright.png";
 LPCWSTR playerWalkingRightLeft = L"Sprites\\Player\\playerwalkingrightleft.png";
 LPCWSTR playerWalkingRightRight = L"Sprites\\Player\\playerwalkingrightright.png";
 LPCWSTR playerHurtBox = L"Sprites\\Debug\\hurtbox.png";
+LPCWSTR playerStationaryUpBasicAttack[9];
 LPCWSTR playerStationaryUpBasicAttack0 = L"Sprites\\Player\\playerstationaryupbasicattack0.png";
 LPCWSTR playerStationaryUpBasicAttack1 = L"Sprites\\Player\\playerstationaryupbasicattack1.png";
 LPCWSTR playerStationaryUpBasicAttack2 = L"Sprites\\Player\\playerstationaryupbasicattack2.png";
@@ -66,12 +67,9 @@ LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
 LPCWSTR checkerBackground = L"Sprites\\Environment\\checkerBackground.png";
 
 // UI
-LPCWSTR hpBarShell = L"Sprites\\UI\\HPBar_Shell.png";
-LPCWSTR hpBarFilling = L"Sprites\\UI\\HPBar_Filling.png";
-LPCWSTR mpBarShell = L"Sprites\\UI\\MPBar_Shell.png";
-LPCWSTR mpBarFilling = L"Sprites\\UI\\MPBar_Filling.png";
-LPCWSTR expBarShell = L"Sprites\\UI\\EXPBar_Shell.png";
-LPCWSTR expBarFilling = L"Sprites\\UI\\EXPBar_Filling.png";
+LPCWSTR hpBarFilling = L"Sprites\\UI\\HP_Bar_Filling.png";
+LPCWSTR mpBarFilling = L"Sprites\\UI\\MP_Bar_Filling.png";
+LPCWSTR expBarFilling = L"Sprites\\UI\\EXP_Bar_Filling.png";
 LPCWSTR skillPanes = L"Sprites\\UI\\Skill Panes.png";
 LPCWSTR Level_Up_Back_Button_Unpressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Back_Button_Unpressed.png";
 LPCWSTR Level_Up_Back_Button_Pressed = L"Sprites\\UI\\Focused Level Up Screen\\Level_Up_Back_Button_Pressed.png";
@@ -109,8 +107,24 @@ LPCWSTR Yellow_Stat_Number_6 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_6.png";
 LPCWSTR Yellow_Stat_Number_7 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_7.png";
 LPCWSTR Yellow_Stat_Number_8 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_8.png";
 LPCWSTR Yellow_Stat_Number_9 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_9.png";
+LPCWSTR UI_Shell = L"Sprites\\UI\\UI_Shell.png";
 
+LPCWSTR BG_home_f = L"Sprites\\Environment\\Home_Front.png";
+LPCWSTR BG_home_b = L"Sprites\\Environment\\Home_Back.png";
+LPCWSTR BG_home_p1 = L"Sprites\\Environment\\Home_Pathway_1.png";
+LPCWSTR BG_home_p2 = L"Sprites\\Environment\\Home_Pathway_2.png";
 
+LPCWSTR small_0 = L"Sprites\\UI\\Fonts\\Small_0.png";
+LPCWSTR small_1 = L"Sprites\\UI\\Fonts\\Small_1.png";
+LPCWSTR small_2 = L"Sprites\\UI\\Fonts\\Small_2.png";
+LPCWSTR small_3 = L"Sprites\\UI\\Fonts\\Small_3.png";
+LPCWSTR small_4 = L"Sprites\\UI\\Fonts\\Small_4.png";
+LPCWSTR small_5 = L"Sprites\\UI\\Fonts\\Small_5.png";
+LPCWSTR small_6 = L"Sprites\\UI\\Fonts\\Small_6.png";
+LPCWSTR small_7 = L"Sprites\\UI\\Fonts\\Small_7.png";
+LPCWSTR small_8 = L"Sprites\\UI\\Fonts\\Small_8.png";
+LPCWSTR small_9 = L"Sprites\\UI\\Fonts\\Small_9.png";
+LPCWSTR small_forwardslash = L"Sprites\\UI\\Fonts\\Small_forwardslash.png";
 
 // Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
@@ -201,15 +215,14 @@ class Object
 public:
     double xPosition = sysScreenX / 2;
     double yPosition = sysScreenY / 2;
-    LPCWSTR fileName = nullptr;
+    LPCWSTR frame = nullptr;
     LPCWSTR lastfilepath = nullptr;
     LPCWSTR secondlastfilepath = nullptr;
     double lastXDirection = 0;
     double lastYDirection = 0;
-    char lastDirection = 'u';
     std::chrono::steady_clock::time_point lastWalkTime = std::chrono::steady_clock::now();
     int framesWalked2 = 0;
-    bool fileNameChanged = false;
+    bool frameChanged = false;
     int state = 3;
     int count = 0;
     D2D1_RECT_F hurtbox;
@@ -218,35 +231,45 @@ public:
     double lastXDirection2 = 0;
     double lastYDirection2 = 0;
 
+    struct {
+        double left;
+        double right;
+        double up;
+        double down;
+    } hitbox;
+
     void WriteFileName(LPCWSTR file_Name)
     {
-        fileName = file_Name;
-        fileNameChanged = true;
+        frame = file_Name;
+        frameChanged = true;
     }
 
     void DestroyObject()
     {
-        fileName = nullptr;
-        fileNameChanged = true;
+        frame = nullptr;
+        frameChanged = true;
     }
 
-    void UpdateGeneralState() {
-        if (lastXDirection >= 1 && lastYDirection == 0) {
-            angleDegrees = 90;
-            lastDirection = 'r';
+    void UpdateHitBox() {
+        ID2D1Bitmap* object = pBitmaps[frame];
+
+        D2D1_SIZE_F size = object->GetSize();
+
+        hitbox.left = xPosition;
+        hitbox.right = xPosition + (size.width * scalerX);
+        hitbox.up = yPosition;
+        hitbox.down = yPosition + (size.height * scalerY);
+    }
+
+    bool CheckCollision(Object& object) {
+        if (hitbox.left < object.hitbox.left + (object.hitbox.right - object.hitbox.left) &&
+            hitbox.left + (hitbox.right - hitbox.left) > object.hitbox.left &&
+            hitbox.up < object.hitbox.up + (object.hitbox.down - object.hitbox.up) &&
+            hitbox.up + (hitbox.down - hitbox.up) > object.hitbox.up)
+        {
+            return true;
         }
-        else if (lastXDirection == 0 && lastYDirection >= 1) {
-            angleDegrees = 180;
-            lastDirection = 'd';
-        }
-        else if (lastXDirection <= -1 && lastYDirection == 0) {
-            angleDegrees = 270;
-            lastDirection = 'l';
-        }
-        else {
-            angleDegrees = 0;
-            lastDirection = 'u';
-        }
+        return false;
     }
 };
 
@@ -271,10 +294,10 @@ public:
     {
         xPosition = rand() % int(rightBorder - leftBorder) + leftBorder;
         yPosition = rand() % sysScreenY;
-        fileName = leafEnemyStationary;
+        frame = leafEnemyStationary;
         lastfilepath = leafEnemyStationary;
         secondlastfilepath = leafEnemyDownWalkingRight;
-        fileNameChanged = true;
+        frameChanged = true;
         SetEnemyHurtBox();
         xDirection = (rand() % 200) - 100;
         yDirection = (rand() % 200) - 100;
@@ -286,7 +309,7 @@ public:
     void SetEnemyHurtBox()
     {
         // Get the bitmap for the currently loaded file
-        ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+        ID2D1Bitmap* pBitmap = pBitmaps[frame];
         if (pBitmap)
         {
             D2D1_SIZE_F size = pBitmap->GetSize();
@@ -319,42 +342,42 @@ public:
         {
             if (lastfilepath == leafEnemyDownWalkingLeft && secondlastfilepath == leafEnemyStationary)
             {
-                fileName = leafEnemyStationary;
-                lastfilepath = fileName;
+                frame = leafEnemyStationary;
+                lastfilepath = frame;
                 secondlastfilepath = leafEnemyDownWalkingLeft;
             }
             else if (lastfilepath == leafEnemyStationary && secondlastfilepath == leafEnemyDownWalkingLeft)
             {
-                fileName = leafEnemyDownWalkingRight;
-                lastfilepath = fileName;
+                frame = leafEnemyDownWalkingRight;
+                lastfilepath = frame;
                 secondlastfilepath = leafEnemyStationary;
             }
             else if (lastfilepath == leafEnemyDownWalkingRight && secondlastfilepath == leafEnemyStationary)
             {
-                fileName = leafEnemyStationary;
-                lastfilepath = fileName;
+                frame = leafEnemyStationary;
+                lastfilepath = frame;
                 secondlastfilepath = leafEnemyDownWalkingRight;
             }
             else if (lastfilepath == leafEnemyStationary && secondlastfilepath == leafEnemyDownWalkingRight)
             {
-                fileName = leafEnemyDownWalkingLeft;
-                lastfilepath = fileName;
+                frame = leafEnemyDownWalkingLeft;
+                lastfilepath = frame;
                 secondlastfilepath = leafEnemyStationary;
             }
             else 
             {
-                fileName = leafEnemyDownWalkingRight;
-                lastfilepath = fileName;
+                frame = leafEnemyDownWalkingRight;
+                lastfilepath = frame;
                 secondlastfilepath = leafEnemyStationary;
             }
             lastWalkTime = std::chrono::steady_clock::now();
-            fileNameChanged = true;
+            frameChanged = true;
         }
     }
 
     void EnemyHitstunAnimation(std::chrono::nanoseconds time)
     {
-        fileName = leafEnemyDownHitstun;
+        frame = leafEnemyDownHitstun;
         lastfilepath = nullptr;
         secondlastfilepath = nullptr;
         hitStunTime = time;
@@ -387,6 +410,8 @@ public:
     int trueDefense = 121;
     int agility = 122;
     int luck = 999;
+    char facingDirection = 'u';
+    __int8 bAttkFrame = -1;
 
     std::vector<std::chrono::nanoseconds> refreshTimes;
 
@@ -424,10 +449,20 @@ public:
     std::chrono::steady_clock::time_point timePointofLastBob = std::chrono::steady_clock::now();
     bool lastBobWasZero = true;
 
+    float wpnXOff[9] = {
+        (10 / 13), (12 / 13), (12 / 13),
+        (11 / 13), (5 / 13), -(6 / 13),
+        -(15 / 13), -(18 / 13), -(15 / 13) };
+    
+    float wpnYOff[9] = {
+        (13 / 21), (11 / 21), 0,
+        -(10 / 21), -(13 / 21), -(10 / 21),
+        -(6 / 21), (1 / 21), (13 / 21) };
+
     Player()
     {
-        fileName = playerStationaryDown;
-        fileNameChanged = true;
+        frame = playerStationaryDown;
+        frameChanged = true;
         SetPlayerHurtBox();
     }
 
@@ -436,218 +471,222 @@ public:
         secondlastfilepath = nullptr;
         if (lastfilepath == playerWalkingDownLeft || lastfilepath == playerStationaryDown || lastfilepath == playerWalkingDownRight)
         {
-            fileName = playerStationaryDown;
+            frame = playerStationaryDown;
         }
         else if (lastfilepath == playerWalkingUpLeft || lastfilepath == playerStationaryUp || lastfilepath == playerWalkingUpRight)
         {
-            fileName = playerStationaryUp;
+            frame = playerStationaryUp;
         }
         else if (lastfilepath == playerWalkingLeftLeft || lastfilepath == playerStationaryLeft || lastfilepath == playerWalkingLeftRight)
         {
-            fileName = playerStationaryLeft;
+            frame = playerStationaryLeft;
         }
         else if (lastfilepath == playerWalkingRightLeft || lastfilepath == playerStationaryRight || lastfilepath == playerWalkingRightRight)
         {
-            fileName = playerStationaryRight;
+            frame = playerStationaryRight;
         }
         lastXDirection = 0;
         lastYDirection = 0;
-        lastfilepath = fileName;
-        fileNameChanged = true;
+        lastfilepath = frame;
+        frameChanged = true;
         SetPlayerHurtBox();
     }
 
-    // These functions are designed to condense the walking logic and make the PlayerWalkAnimation function more readable
+    // These functions are designed to condense the walking logic and make the PlayerWalkLogic function more readable
     void PlayerWalkingDownLogic(double xDirection, double yDirection)
     {
+        facingDirection = 'd';
         if (lastfilepath != playerStationaryDown && lastfilepath != playerWalkingDownLeft && lastfilepath != playerWalkingDownRight)
         {
-            fileName = playerWalkingDownLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingDownLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerStationaryDown && secondlastfilepath == nullptr)
         {
-            fileName = playerWalkingDownLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingDownLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerWalkingDownLeft && secondlastfilepath == nullptr)
         {
-            fileName = playerStationaryDown;
+            frame = playerStationaryDown;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryDown && secondlastfilepath == playerWalkingDownLeft)
         {
-            fileName = playerWalkingDownRight;
+            frame = playerWalkingDownRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingDownRight && secondlastfilepath == playerStationaryDown)
         {
-            fileName = playerStationaryDown;
+            frame = playerStationaryDown;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryDown && secondlastfilepath == playerWalkingDownRight)
         {
-            fileName = playerWalkingDownLeft;
+            frame = playerWalkingDownLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingDownLeft && secondlastfilepath == playerStationaryDown)
         {
-            fileName = playerStationaryDown;
+            frame = playerStationaryDown;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         lastXDirection = xDirection;
         lastYDirection = yDirection;
     }
     void PlayerWalkingUpLogic(double xDirection, double yDirection)
     {
+        facingDirection = 'u';
         if (lastfilepath != playerStationaryUp && lastfilepath != playerWalkingUpLeft && lastfilepath != playerWalkingUpRight)
         {
-            fileName = playerWalkingUpLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingUpLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerStationaryUp && secondlastfilepath == nullptr)
         {
-            fileName = playerWalkingUpLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingUpLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerWalkingUpLeft && secondlastfilepath == nullptr)
         {
-            fileName = playerStationaryUp;
+            frame = playerStationaryUp;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryUp && secondlastfilepath == playerWalkingUpLeft)
         {
-            fileName = playerWalkingUpRight;
+            frame = playerWalkingUpRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingUpRight && secondlastfilepath == playerStationaryUp)
         {
-            fileName = playerStationaryUp;
+            frame = playerStationaryUp;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryUp && secondlastfilepath == playerWalkingUpRight)
         {
-            fileName = playerWalkingUpLeft;
+            frame = playerWalkingUpLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingUpLeft && secondlastfilepath == playerStationaryUp)
         {
-            fileName = playerStationaryUp;
+            frame = playerStationaryUp;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         lastXDirection = xDirection;
         lastYDirection = yDirection;
     }
     void PlayerWalkingLeftLogic(double xDirection, double yDirection)
     {
+        facingDirection = 'l';
         if (lastfilepath != playerStationaryLeft && lastfilepath != playerWalkingLeftLeft && lastfilepath != playerWalkingLeftRight)
         {
-            fileName = playerWalkingLeftLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingLeftLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerStationaryLeft && secondlastfilepath == nullptr)
         {
-            fileName = playerWalkingLeftLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingLeftLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerWalkingLeftLeft && secondlastfilepath == nullptr)
         {
-            fileName = playerStationaryLeft;
+            frame = playerStationaryLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryLeft && secondlastfilepath == playerWalkingLeftLeft)
         {
-            fileName = playerWalkingLeftRight;
+            frame = playerWalkingLeftRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingLeftRight && secondlastfilepath == playerStationaryLeft)
         {
-            fileName = playerStationaryLeft;
+            frame = playerStationaryLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryLeft && secondlastfilepath == playerWalkingLeftRight)
         {
-            fileName = playerWalkingLeftLeft;
+            frame = playerWalkingLeftLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingLeftLeft && secondlastfilepath == playerStationaryLeft)
         {
-            fileName = playerStationaryLeft;
+            frame = playerStationaryLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         lastXDirection = xDirection;
         lastYDirection = yDirection;
     }
     void PlayerWalkingRightLogic(double xDirection, double yDirection)
     {
+        facingDirection = 'r';
         if (lastfilepath != playerStationaryRight && lastfilepath != playerWalkingRightLeft && lastfilepath != playerWalkingRightRight)
         {
-            fileName = playerWalkingRightLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingRightLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerStationaryRight && secondlastfilepath == nullptr)
         {
-            fileName = playerWalkingRightLeft;
-            lastfilepath = fileName;
+            frame = playerWalkingRightLeft;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
         }
         else if (lastfilepath == playerWalkingRightLeft && secondlastfilepath == nullptr)
         {
-            fileName = playerStationaryRight;
+            frame = playerStationaryRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryRight && secondlastfilepath == playerWalkingRightLeft)
         {
-            fileName = playerWalkingRightRight;
+            frame = playerWalkingRightRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingRightRight && secondlastfilepath == playerStationaryRight)
         {
-            fileName = playerStationaryRight;
+            frame = playerStationaryRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerStationaryRight && secondlastfilepath == playerWalkingRightRight)
         {
-            fileName = playerWalkingRightLeft;
+            frame = playerWalkingRightLeft;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         else if (lastfilepath == playerWalkingRightLeft && secondlastfilepath == playerStationaryRight)
         {
-            fileName = playerStationaryRight;
+            frame = playerStationaryRight;
             secondlastfilepath = lastfilepath;
-            lastfilepath = fileName;
+            lastfilepath = frame;
         }
         lastXDirection = xDirection;
         lastYDirection = yDirection;
     }
 
-    void PlayerWalkAnimation(double xDirection, double yDirection)
+    void PlayerWalkLogic(double xDirection, double yDirection)
     {   // An eyeful to read
         if (std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - lastWalkTime) >= walkAnimationInterval)
             //&& ((yDirection == 0 && (((abs(xDirection) - abs(lastXDirection)) != 0)) || (xDirection == 0 && ((abs(yDirection) - abs(lastYDirection)) != 0)))
@@ -658,6 +697,7 @@ public:
                 || lastfilepath == playerWalkingDownLeft || lastfilepath == playerWalkingDownRight))
             {
                 PlayerWalkingDownLogic(xDirection, yDirection);
+                
             }
             else if ((yDirection < 0 && xDirection != 0) && (lastfilepath == playerStationaryUp
                 || lastfilepath == playerWalkingUpLeft || lastfilepath == playerWalkingUpRight))
@@ -694,14 +734,14 @@ public:
             }
 
             lastWalkTime = std::chrono::steady_clock::now();
-            fileNameChanged = true;
+            frameChanged = true;
         }
     }
 
     // Sets the hurtbox for the player. This is how the game knows if the player has been hit or is touching something.
     void SetPlayerHurtBox()
     {
-        ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+        ID2D1Bitmap* pBitmap = pBitmaps[frame];
         if (pBitmap)
         {
             D2D1_SIZE_F size = pBitmap->GetSize();
@@ -722,192 +762,59 @@ public:
         SetPlayerHurtBox();
     }
 
-    void SwapAttackFrames(LPCWSTR nextFrame, LPCWSTR lastFrame, LPCWSTR weaponFrame) {
-        fileName = nextFrame;
-        lastfilepath = fileName;
-        secondlastfilepath = lastFrame;
-        fileNameChanged = true;
+    void SwapWeaponFrames(LPCWSTR nextFrame, LPCWSTR lastFrame, LPCWSTR weaponFrame) {
         weaponFileName = weaponFrame;
+    }
+
+    void SwapPlayerFrames(char facingDirection) {
+        lastBasicAttackFrame = std::chrono::steady_clock::now();
+        bAttkFrame++;
+        secondlastfilepath = frame;
+        switch (facingDirection) {
+        case 'u':
+            frame = playerStationaryUpBasicAttack[bAttkFrame];
+            break;
+        /*case 'd':
+        case 'l':
+        case 'r':*/
+
+        }
+        lastfilepath = frame;
+        frameChanged = true;
+        return
     }
 
     void BasicAttack(std::vector<Enemy>& enemies)
     {
-        if (weaponFileName == nullptr)
+        if (bAttkFrame != 9)
         {
-            SwapAttackFrames(playerStationaryUpBasicAttack0, playerStationaryUp, testSwordBasicAttackUp0);
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
+            if (bAttkFrame == -1) bAttkFrame = 0;
+            SwapPlayerFrames(facingDirection);
+            weaponFileName = testSwordBasicAttackUp0;
+            ID2D1Bitmap* pBitmap = pBitmaps[frame];
             if (pBitmap)
             {
                 D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * 10 / 13) * scalerX);
-                weaponYPosition = yPosition + ((size.height * 13 / 21) * scalerY);
+                weaponXPosition = xPosition + ((size.width * wpnXOff[bAttkFrame]) * scalerX);
+                weaponYPosition = yPosition + ((size.height * wpnYOff[bAttkFrame]) * scalerY);
             }
 
             SetHitBox();
             SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
-
         }
-        else if (lastfilepath == playerStationaryUpBasicAttack0
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements))
-        {
-            SwapAttackFrames(playerStationaryUpBasicAttack1, playerStationaryUpBasicAttack0, testSwordBasicAttackUp1);
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * 12 / 13) * scalerX);
-                weaponYPosition = yPosition + ((size.height * 11 / 21) * scalerY);
-            }
-
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            hitLag = std::chrono::nanoseconds(0);
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack1
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= (hitLag + basicAttackFrameIncrements))
-        {
-            SwapAttackFrames(playerStationaryUpBasicAttack2, playerStationaryUpBasicAttack1, testSwordBasicAttackUp2);
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * 12 / 13) * scalerX);
-                weaponYPosition = yPosition;
-            }
-
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack2
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements)
-        {
-            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            SwapAttackFrames(playerStationaryUpBasicAttack3, playerStationaryUpBasicAttack2, testSwordBasicAttackUp3);
-
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * 11 / 13) * scalerX);
-                weaponYPosition = yPosition - ((size.height * 10 / 21) * scalerY);
-            }
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack3
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements)
-        {
-            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            SwapAttackFrames(playerStationaryUpBasicAttack4, playerStationaryUpBasicAttack3, testSwordBasicAttackUp4);
-
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition + ((size.width * 5 / 13) * scalerX);
-                weaponYPosition = yPosition - ((size.height * 13 / 21) * scalerY);
-            }
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack4
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements)
-        {
-            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            SwapAttackFrames(playerStationaryUpBasicAttack5, playerStationaryUpBasicAttack4, testSwordBasicAttackUp5);
-
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition - ((size.width * 6 / 13) * scalerX);
-                weaponYPosition = yPosition - ((size.height * 10 / 21) * scalerY);
-            }
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack5
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + basicAttackFrameIncrements)
-        {
-            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            SwapAttackFrames(playerStationaryUpBasicAttack6, playerStationaryUpBasicAttack5, testSwordBasicAttackUp6);
-
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition - ((size.width * 15 / 13) * scalerX);
-                weaponYPosition = yPosition - ((size.height * 6 / 21) * scalerY);
-            }
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack6
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements))
-        {
-            refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
-            SwapAttackFrames(playerStationaryUpBasicAttack7, playerStationaryUpBasicAttack6, testSwordBasicAttackUp7);
-
-            ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-            if (pBitmap)
-            {
-                D2D1_SIZE_F size = pBitmap->GetSize();
-                weaponXPosition = xPosition - ((size.width * 18 / 13) * scalerX);
-                weaponYPosition = yPosition + ((size.height * 1 / 21) * scalerY);
-            }
-            SetHitBox();
-            SetPlayerHurtBox();
-            basicAttackFrameThresholds += 1;
-        }
-        else if (lastfilepath == playerStationaryUpBasicAttack7
-            && std::chrono::steady_clock::now() - lastBasicAttackFrame >= hitLag + (basicAttackFrameIncrements))
-            {
-                refreshTimes.emplace_back(std::chrono::steady_clock::now() - lastBasicAttackFrame);
-                lastBasicAttackFrame = std::chrono::steady_clock::now();
-                SwapAttackFrames(playerStationaryUpBasicAttack8, playerStationaryUpBasicAttack7, testSwordBasicAttackUp8);
-
-                ID2D1Bitmap* pBitmap = pBitmaps[fileName];
-                if (pBitmap)
-                {
-                    D2D1_SIZE_F size = pBitmap->GetSize();
-                    weaponXPosition = xPosition - ((size.width * 15 / 13) * scalerX);
-                    weaponYPosition = yPosition + ((size.height * 13 / 21) * scalerY);
-                }
-                SetHitBox();
-                SetPlayerHurtBox();
-                basicAttackFrameThresholds += 1;
-             }
         else if (lastfilepath == playerStationaryUpBasicAttack8
             && std::chrono::steady_clock::now() - lastBasicAttackFrame >= basicAttackEndLag + (hitLag + (basicAttackFrameIncrements * 3))
             && keys.space == false)
         {
-            fileName = playerStationaryUp;
-            lastfilepath = fileName;
+            frame = playerStationaryUp;
+            lastfilepath = frame;
             secondlastfilepath = nullptr;
-            fileNameChanged = true;
+            frameChanged = true;
             isBasicAttacking = false;
 
             weaponFileName = nullptr;
             RemoveHitBox();
             SetPlayerHurtBox();
-            basicAttackFrameThresholds = 1;
-            lastBasicAttackFrame = std::chrono::steady_clock::now();
             for (int i = 0; i < enemies.size(); i++)
             {
                 enemies.at(i).alreadyHit = false;
@@ -959,6 +866,9 @@ public:
                 }
             }
         }
+        else {
+            weaponFileName = nullptr;
+        }
 
     }
 
@@ -981,13 +891,44 @@ public:
     void PlayerLevelUpSequence() {
         inLevelUpSequence = true;
         inLevelUpFanfare = true;
-        fileName = playerLevelUp;
+        frame = playerLevelUp;
         weaponFileName = nullptr;
         yPosition -= 15 * scalerY;
         RemoveHitBox();
         levelUpFanfareBegin = std::chrono::steady_clock::now();
     }
 
+};
+
+class Door : public Object {
+public:
+    float destX, destY;
+    unsigned __int8 destID;
+    Door(unsigned __int8 l, unsigned __int8 r, unsigned __int8 u, unsigned __int8 d, float toX, float toY, unsigned __int8 toID) {
+        hitbox.left = (l * scalerX) + leftBorder;
+        hitbox.right = (r * scalerX) + leftBorder;
+        hitbox.up = u * scalerY;
+        hitbox.down = d * scalerY;
+        destX = (toX * scalerX) + leftBorder;
+        destY = toY * scalerY;
+        destID = toID;
+    }
+};
+
+class Environment {
+public:
+    unsigned __int8 id;
+    LPCWSTR frame;
+    std::vector<Door> doors;
+
+    Environment(LPCWSTR file, unsigned __int8 ident) {
+        frame = file;
+        id = ident;
+    }
+
+    void AddDoor(unsigned __int8 l, unsigned __int8 r, unsigned __int8 u, unsigned __int8 d, float toX, float toY, unsigned __int8 toID) {
+        doors.emplace_back(l, r, u, d, toX, toY, toID);
+    }
 };
 
 /*class Enemy : public Object
@@ -1008,7 +949,7 @@ void ApplyPlayerDirectionalInput(Player& player, std::chrono::steady_clock::time
             || ((player.hurtbox.left <= leftBorder || player.hurtbox.right >= rightBorder) && yDir != 0)
             || ((player.hurtbox.top <= 0 || player.hurtbox.bottom >= sysScreenY) && xDir != 0))
         {
-            player.PlayerWalkAnimation(xDir, yDir);
+            player.PlayerWalkLogic(xDir, yDir);
         }
         else
         {
@@ -1149,16 +1090,16 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     // player hitbox
     spriteData.emplace_back(playerHitBox);
 
+    // UI Shell
+    spriteData.emplace_back(UI_Shell);
+
     // HP Bar
-    spriteData.emplace_back(hpBarShell);
     spriteData.emplace_back(hpBarFilling);
 
     // MP Bar
-    spriteData.emplace_back(mpBarShell);
     spriteData.emplace_back(mpBarFilling);
 
     // MP Bar
-    spriteData.emplace_back(expBarShell);
     spriteData.emplace_back(expBarFilling);
 
     // Level Up
@@ -1201,12 +1142,29 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
 
     spriteData.emplace_back(Focused_Level_Up_Down_Arrow);
 
+    // Small UI Numbers
+    spriteData.emplace_back(small_0);
+    spriteData.emplace_back(small_1);
+    spriteData.emplace_back(small_2);
+    spriteData.emplace_back(small_3);
+    spriteData.emplace_back(small_4);
+    spriteData.emplace_back(small_5);
+    spriteData.emplace_back(small_6);
+    spriteData.emplace_back(small_7);
+    spriteData.emplace_back(small_8);
+    spriteData.emplace_back(small_9);
+    spriteData.emplace_back(small_forwardslash);
+
 
     //---------------- Environment -----------------//
 
     // Background
     spriteData.emplace_back(testBackground);
     spriteData.emplace_back(checkerBackground);
+    spriteData.emplace_back(BG_home_f);
+    spriteData.emplace_back(BG_home_b);
+    spriteData.emplace_back(BG_home_p1);
+    spriteData.emplace_back(BG_home_p2);
 }
 
 void CreateDeviceResources(HWND hWnd, std::vector<LPCWSTR> spriteData)
@@ -1643,13 +1601,22 @@ void RenderStats(ID2D1Bitmap* stat1, ID2D1Bitmap* stat2, ID2D1Bitmap* stat3, int
     }
 }
 
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vector<Enemy> enemies)
+std::vector<LPCWSTR> spriteData;
+Player player;
+Enemy leafEnemy[50];
+std::vector<Enemy> enemies; 
+int startingStats[9];
+std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
+std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
+std::vector<Object> walls;
+std::vector<Environment> environments;
+unsigned __int8 currentEnvID(1);
+
+void Render(HWND hWnd)
 {
-    if (!pRenderTarget)
-    {
-        CreateDeviceResources(hWnd, spriteData);
-    }
+
 
     if (pRenderTarget)
     {
@@ -1658,7 +1625,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
         // Get bitmap for background
-        ID2D1Bitmap* background = pBitmaps[testBackground];
+        ID2D1Bitmap* background = pBitmaps[environments.at(currentEnvID - 1).frame];
 
         // Render background
         if (background)
@@ -1673,7 +1640,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         for (int i = 0; i < enemies.size(); i++)
         {
             // Get bitmap for enemies
-            ID2D1Bitmap* enemyFrameBitmap = pBitmaps[enemies.at(i).fileName];
+            ID2D1Bitmap* enemyFrameBitmap = pBitmaps[enemies.at(i).frame];
 
             // Render player
             if (enemyFrameBitmap)
@@ -1709,7 +1676,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         }
 
         // Get the player bitmap
-        ID2D1Bitmap* playerFrameBitmap = pBitmaps[player.fileName];
+        ID2D1Bitmap* playerFrameBitmap = pBitmaps[player.frame];
 
         // Render player
         if (playerFrameBitmap)
@@ -1741,7 +1708,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
         if (playerWeaponFrameBitmap)
         {
             D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
-            D2D1_POINT_2F midpoint = D2D1::Point2F((player.weaponXPosition + ((size.width * scalerX)/2)), ((player.weaponYPosition + (size.height * scalerY) / 2)));
+            D2D1_POINT_2F midpoint = D2D1::Point2F((player.weaponXPosition + ((size.width * scalerX) / 2)), ((player.weaponYPosition + (size.height * scalerY) / 2)));
             D2D1_MATRIX_3X2_F rotate = D2D1::Matrix3x2F::Rotation(player.angleDegrees, midpoint);
             pRenderTarget->SetTransform(rotate);
             D2D1_RECT_F destRect = D2D1::RectF(player.weaponXPosition, player.weaponYPosition,
@@ -1783,30 +1750,6 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             );
         }
 
-        // Get HP Bar Shell Bitmap
-        ID2D1Bitmap* playerHPBarShell = pBitmaps[hpBarShell];
-
-        // Render HP Bar SHell
-        if (playerHPBarShell)
-        {
-            D2D1_SIZE_F size = playerHPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 0 + 10,
-                rightBorder - 10, 10 + (3 * size.height));
-            pRenderTarget->DrawBitmap(playerHPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-            // Draw HP total
-            WCHAR buffer[128];
-            swprintf_s(buffer, L"%.0f/%.0f", player.HP, player.maxHP);
-            D2D1_RECT_F layoutRect = D2D1::RectF(rightBorder - (3 * size.width) - 200, 24, rightBorder - (3 * size.width) - 15, size.height / 2 + 38);
-            pRenderTarget->DrawText(
-                buffer,
-                wcslen(buffer),
-                pTextFormat,
-                layoutRect,
-                pBrush
-            );
-        }
-
         // Get HP Bar filling bitmap
         ID2D1Bitmap* playerHPBarFilling = pBitmaps[hpBarFilling];
 
@@ -1821,37 +1764,12 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, hpBarWidth, size.height);
 
-            double w = ((size.width) - 13) * 3;
-            double h = size.height * 3;
+            double h = size.height;
 
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 10,
-                rightBorder - (3 * size.width) - 13 + (3 * hpBarWidth), 10 + h);
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (((size.width) + 5) * scalerX), 4 * scalerY,
+                rightBorder - (((size.width) + 5) * scalerX) + (hpBarWidth * scalerX), (4 + h) * scalerX);
 
             pRenderTarget->DrawBitmap(playerHPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
-        }
-
-        // Get MP Bar Shell Bitmap
-        ID2D1Bitmap* playerMPBarShell = pBitmaps[mpBarShell];
-
-        // Render MP Bar Shell
-        if (playerMPBarShell)
-        {
-            D2D1_SIZE_F size = playerMPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 10 + (3 * size.height),
-                rightBorder - 10, 10 + (6 * size.height));
-            pRenderTarget->DrawBitmap(playerMPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-            // Draw MP total
-            WCHAR buffer[128];
-            swprintf_s(buffer, L"%.0f/%.0f", player.MP, player.maxMP);
-            D2D1_RECT_F layoutRect = D2D1::RectF(rightBorder - (3 * size.width) - 200, 78, rightBorder - (3 * size.width) - 15, size.height + 300);
-            pRenderTarget->DrawText(
-                buffer,
-                wcslen(buffer),
-                pTextFormat,
-                layoutRect,
-                pBrush
-            );
         }
 
         // Get MP Bar Filling bitmap
@@ -1864,24 +1782,14 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
 
             double mpRatio = player.MP / player.maxMP;
             unsigned int mpBarWidth = size.width * mpRatio;
+            double h = size.height;
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, mpBarWidth, size.height);
 
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 10 + (3 * size.height),
-                rightBorder - (3 * size.width) - 13 + (3 * mpBarWidth), 10 + (6 * size.height));
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (((size.width) + 5) * scalerX), 17 * scalerY,
+                rightBorder - (((size.width) + 5) * scalerX) + (mpBarWidth * scalerX), (17 + h) * scalerX);
 
             pRenderTarget->DrawBitmap(playerMPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
-        }
-
-        // EXP Bar Shell
-        ID2D1Bitmap* playerEXPBarShell = pBitmaps[expBarShell];
-
-        if (playerEXPBarShell)
-        {
-            D2D1_SIZE_F size = playerEXPBarShell->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 10, 122,
-                rightBorder - 10, 134);
-            pRenderTarget->DrawBitmap(playerEXPBarShell, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
         // EXP Bar Filling
@@ -1899,10 +1807,18 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
 
             D2D1_RECT_F srcRect = D2D1::RectF(0, 0, expBarWidth, size.height);
 
-            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (3 * size.width) - 13, 122,
-                rightBorder - (3 * size.width) - 13 + (3 * expBarWidth), 134);
+            D2D1_RECT_F destRect = D2D1::RectF(rightBorder - (((size.width) + 5) * scalerX), 31 * scalerY,
+                rightBorder - (((size.width) + 5) * scalerX) + (expBarWidth * scalerX), (31 + size.height) * scalerX);
 
             pRenderTarget->DrawBitmap(playerEXPBarFilling, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, srcRect);
+        }
+
+        // UI Shell
+        ID2D1Bitmap* UIShellBMP = pBitmaps[UI_Shell];
+        if (UIShellBMP) {
+            D2D1_SIZE_F size = UIShellBMP->GetSize();
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder, 0, rightBorder, sysScreenY);
+            pRenderTarget->DrawBitmap(UIShellBMP, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
         }
 
         // Skill Panes
@@ -1951,54 +1867,62 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                 player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                 player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
             }
-            
+
             if ((std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime) >= std::chrono::milliseconds(64)) {
 
                 if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_1) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_2;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_2) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_2) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_3;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_3) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_4;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_4) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_5;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_5) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_6;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_6) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_7;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_7) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_7) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_8;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_8) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_8) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_9;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
-                } else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_9 &&
-                           std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime >= std::chrono::milliseconds(250)) {
+                }
+                else if (player.lastLevelUpOverworldTextFileName == Level_Up_Overworld_Text_9 &&
+                    std::chrono::steady_clock::now() - player.lastLevelUpOverworldTextTime >= std::chrono::milliseconds(250)) {
                     player.levelUpOverworldTextFileName = Level_Up_Overworld_Text_1;
                     player.lastLevelUpOverworldTextFileName = player.levelUpOverworldTextFileName;
                     player.lastLevelUpOverworldTextTime = std::chrono::steady_clock::now();
                 }
 
-                
+
             }
 
             // Get level up overworld text bitmap
             ID2D1Bitmap* level_Up_Overworld_Text = pBitmaps[player.levelUpOverworldTextFileName];
-            
+
 
             // Render level up overworld text
             if (level_Up_Overworld_Text)
@@ -2031,7 +1955,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             {
                 D2D1_SIZE_F size = shellBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (64 * scalerX), 1 * scalerY,
-                                                  ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
+                    ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
                 pRenderTarget->DrawBitmap(shellBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
 
@@ -2055,7 +1979,8 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             if (player.statSelection == 1) {
                 TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3, true);
                 yArrowOffset = 60;
-            } else {
+            }
+            else {
                 TranslateStatstoBitmap(player.dexterity, dexStat1, dexStat2, dexStat3, false);
             }
 
@@ -2188,7 +2113,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
             // Render back button
             if (backButtonBitmap)
             {
-                
+
                 D2D1_SIZE_F size = backButtonBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (84 * scalerX), 207 * scalerY,
                     ((leftBorder + (84 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
@@ -2206,7 +2131,7 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
                     ((leftBorder + (135 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
                 pRenderTarget->DrawBitmap(confirmButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
-            
+
 
             //// Get confirm bitmap
             //ID2D1Bitmap* confirmButton = pBitmaps[Level_Up_Confirm_Button_Unpressed];
@@ -2266,20 +2191,16 @@ void Render(HWND hWnd, std::vector<LPCWSTR> spriteData, Player& player, std::vec
     }
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-std::vector<LPCWSTR> spriteData;
-Player player;
-Enemy leafEnemy[50];
-std::vector<Enemy> enemies; 
-int startingStats[9];
-std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
-std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
-
 void UpdateGameLogic(double deltaSeconds) {
     if (!player.inLevelUpSequence) {
-        if (keys.down && !keys.up && !keys.right && !keys.left) {
-            player.UpdateGeneralState();
+        player.UpdateHitBox();
+        for (auto door : environments.at(currentEnvID - 1).doors) {
+            if (player.CheckCollision(door)) {
+                currentEnvID = door.destID;
+                player.xPosition = door.destX;
+                player.yPosition = door.destY;
+                continue;
+            }
         }
         // Enemy Movement and Animations
         for (int i = 0; i < enemies.size(); i++)
@@ -2337,7 +2258,6 @@ void UpdateGameLogic(double deltaSeconds) {
 
         else if (keys.space == true || player.isBasicAttacking == true)
         {
-            player.isBasicAttacking = true;
             player.BasicAttack(enemies);
         }
 
@@ -2485,7 +2405,16 @@ void UpdateGameLogic(double deltaSeconds) {
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
-{
+{ 
+    playerStationaryUpBasicAttack[0] = L"Sprites\\Player\\playerstationaryupbasicattack0.png";
+    playerStationaryUpBasicAttack[1] = L"Sprites\\Player\\playerstationaryupbasicattack1.png";
+    playerStationaryUpBasicAttack[2] = L"Sprites\\Player\\playerstationaryupbasicattack2.png";
+    playerStationaryUpBasicAttack[3] = L"Sprites\\Player\\playerstationaryupbasicattack3.png";
+    playerStationaryUpBasicAttack[4] = L"Sprites\\Player\\playerstationaryupbasicattack4.png";
+    playerStationaryUpBasicAttack[5] = L"Sprites\\Player\\playerstationaryupbasicattack5.png";
+    playerStationaryUpBasicAttack[6] = L"Sprites\\Player\\playerstationaryupbasicattack6.png";
+    playerStationaryUpBasicAttack[7] = L"Sprites\\Player\\playerstationaryupbasicattack7.png";
+    playerStationaryUpBasicAttack[8] = L"Sprites\\Player\\playerstationaryupbasicattack8.png";
     srand(time(NULL));
 
     // Load all Sprites
@@ -2493,6 +2422,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 
     // Load Enemy Info
     populateEnemyExpList();
+
+    environments.emplace_back(BG_home_f, environments.size() + 1);
+    environments.back().AddDoor(40, 104, 0, 1, 72, 202, 2);
+    environments.emplace_back(BG_home_b, environments.size() + 1);
+    environments.back().AddDoor(40, 104, 223, 224, 72, 1, 1);
 
     std::vector<bool> calendar(365, false);
 
@@ -2527,6 +2461,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
 
             if (hWnd)
             {
+                CreateDeviceResources(hWnd, spriteData);
                 ShowWindow(hWnd, nCmdShow);
 
                 MSG msg;
@@ -2626,7 +2561,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         timeSinceLogicUpdate = std::chrono::steady_clock::now();
         UpdateGameLogic(deltaSeconds);
 
-        Render(hWnd, spriteData, player, enemies);
+        Render(hWnd);
 
         EndPaint(hWnd, &ps);
 
