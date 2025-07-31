@@ -7,6 +7,7 @@
 #include <map>
 #include <limits>
 #include <time.h>
+#include <random>
 #include <stdlib.h>
 #include <string>
 
@@ -114,7 +115,10 @@ LPCWSTR Yellow_Stat_Number_7 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_7.png";
 LPCWSTR Yellow_Stat_Number_8 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_8.png";
 LPCWSTR Yellow_Stat_Number_9 = L"Sprites\\UI\\Fonts\\Yellow_Stat_Number_9.png";
 LPCWSTR UI_Shell = L"Sprites\\UI\\UI_Shell.png";
+LPCWSTR small_forwardslash = L"Sprites\\UI\\Fonts\\Small_forwardslash.png";
+LPCWSTR plus = L"Sprites\\UI\\Fonts\\Plus.png";
 
+//Fonts
 LPCWSTR small_0 = L"Sprites\\UI\\Fonts\\Small_0.png";
 LPCWSTR small_1 = L"Sprites\\UI\\Fonts\\Small_1.png";
 LPCWSTR small_2 = L"Sprites\\UI\\Fonts\\Small_2.png";
@@ -125,15 +129,67 @@ LPCWSTR small_6 = L"Sprites\\UI\\Fonts\\Small_6.png";
 LPCWSTR small_7 = L"Sprites\\UI\\Fonts\\Small_7.png";
 LPCWSTR small_8 = L"Sprites\\UI\\Fonts\\Small_8.png";
 LPCWSTR small_9 = L"Sprites\\UI\\Fonts\\Small_9.png";
-LPCWSTR small_forwardslash = L"Sprites\\UI\\Fonts\\Small_forwardslash.png";
+LPCWSTR lower_a = L"Sprites\\UI\\Fonts\\lower_a.png";
+LPCWSTR lower_b = L"Sprites\\UI\\Fonts\\lower_b.png";
+LPCWSTR lower_c = L"Sprites\\UI\\Fonts\\lower_c.png";
+LPCWSTR lower_d = L"Sprites\\UI\\Fonts\\lower_d.png";
+LPCWSTR lower_e = L"Sprites\\UI\\Fonts\\lower_e.png";
+LPCWSTR lower_f = L"Sprites\\UI\\Fonts\\lower_f.png";
+LPCWSTR lower_g = L"Sprites\\UI\\Fonts\\lower_g.png";
+LPCWSTR lower_h = L"Sprites\\UI\\Fonts\\lower_h.png";
+LPCWSTR lower_i = L"Sprites\\UI\\Fonts\\lower_i.png";
+LPCWSTR lower_j = L"Sprites\\UI\\Fonts\\lower_j.png";
+LPCWSTR lower_k = L"Sprites\\UI\\Fonts\\lower_k.png";
+LPCWSTR lower_l = L"Sprites\\UI\\Fonts\\lower_l.png";
+LPCWSTR lower_m = L"Sprites\\UI\\Fonts\\lower_m.png";
+LPCWSTR lower_n = L"Sprites\\UI\\Fonts\\lower_n.png";
+LPCWSTR lower_o = L"Sprites\\UI\\Fonts\\lower_o.png";
+LPCWSTR lower_p = L"Sprites\\UI\\Fonts\\lower_p.png";
+LPCWSTR lower_q = L"Sprites\\UI\\Fonts\\lower_q.png";
+LPCWSTR lower_r = L"Sprites\\UI\\Fonts\\lower_r.png";
+LPCWSTR lower_s = L"Sprites\\UI\\Fonts\\lower_s.png";
+LPCWSTR lower_t = L"Sprites\\UI\\Fonts\\lower_t.png";
+LPCWSTR lower_u = L"Sprites\\UI\\Fonts\\lower_u.png";
+LPCWSTR lower_v = L"Sprites\\UI\\Fonts\\lower_v.png";
+LPCWSTR lower_w = L"Sprites\\UI\\Fonts\\lower_w.png";
+LPCWSTR lower_x = L"Sprites\\UI\\Fonts\\lower_x.png";
+LPCWSTR lower_y = L"Sprites\\UI\\Fonts\\lower_y.png";
+LPCWSTR lower_z = L"Sprites\\UI\\Fonts\\lower_z.png";
+LPCWSTR upper_a = L"Sprites\\UI\\Fonts\\Capital_A.png";
+LPCWSTR upper_b = L"Sprites\\UI\\Fonts\\Capital_B.png";
+LPCWSTR upper_c = L"Sprites\\UI\\Fonts\\Capital_C.png";
+LPCWSTR upper_d = L"Sprites\\UI\\Fonts\\Capital_D.png";
+LPCWSTR upper_e = L"Sprites\\UI\\Fonts\\Capital_E.png";
+LPCWSTR upper_f = L"Sprites\\UI\\Fonts\\Capital_F.png";
+LPCWSTR upper_g = L"Sprites\\UI\\Fonts\\Capital_G.png";
+LPCWSTR upper_h = L"Sprites\\UI\\Fonts\\Capital_H.png";
+LPCWSTR upper_i = L"Sprites\\UI\\Fonts\\Capital_I.png";
+LPCWSTR upper_j = L"Sprites\\UI\\Fonts\\Capital_J.png";
+LPCWSTR upper_k = L"Sprites\\UI\\Fonts\\Capital_K.png";
+LPCWSTR upper_l = L"Sprites\\UI\\Fonts\\Capital_L.png";
+LPCWSTR upper_m = L"Sprites\\UI\\Fonts\\Capital_M.png";
+LPCWSTR upper_n = L"Sprites\\UI\\Fonts\\Capital_N.png";
+LPCWSTR upper_o = L"Sprites\\UI\\Fonts\\Capital_O.png";
+LPCWSTR upper_p = L"Sprites\\UI\\Fonts\\Capital_P.png";
+LPCWSTR upper_q = L"Sprites\\UI\\Fonts\\Capital_Q.png";
+LPCWSTR upper_r = L"Sprites\\UI\\Fonts\\Capital_R.png";
+LPCWSTR upper_s = L"Sprites\\UI\\Fonts\\Capital_S.png";
+LPCWSTR upper_t = L"Sprites\\UI\\Fonts\\Capital_T.png";
+LPCWSTR upper_u = L"Sprites\\UI\\Fonts\\Capital_U.png";
+LPCWSTR upper_v = L"Sprites\\UI\\Fonts\\Capital_V.png";
+LPCWSTR upper_w = L"Sprites\\UI\\Fonts\\Capital_W.png";
+LPCWSTR upper_x = L"Sprites\\UI\\Fonts\\Capital_X.png";
+LPCWSTR upper_y = L"Sprites\\UI\\Fonts\\Capital_Y.png";
+LPCWSTR upper_z = L"Sprites\\UI\\Fonts\\Capital_Z.png";
+LPCWSTR invalid_char = L"Sprites\\UI\\Fonts\\Invalid_Char.png";
 
 // Misc
 LPCWSTR man = L"Sprites\\Enemies\\1.png";
 
 // Maps of info regarding various enemies
 std::map<const std::string, int> experience;
-
 const float pi = 3.141592;
+std::mt19937 generator(std::random_device{}());
 
 void populateEnemyExpList() {
     experience["Leafnir"] = 10;
@@ -186,6 +242,66 @@ std::chrono::steady_clock::time_point timeSinceLastFrame = std::chrono::steady_c
 
 // Game logic latency
 std::chrono::steady_clock::time_point timeSinceLogicUpdate = std::chrono::steady_clock::now();
+
+LPCWSTR fontArray[58]{
+    upper_a,
+    upper_b,
+    upper_c,
+    upper_d,
+    upper_e,
+    upper_f,
+    upper_g,
+    upper_h,
+    upper_i,
+    upper_j,
+    upper_k,
+    upper_l,
+    upper_m,
+    upper_n,
+    upper_o,
+    upper_p,
+    upper_q,
+    upper_r,
+    upper_s,
+    upper_t,
+    upper_u,
+    upper_v,
+    upper_w,
+    upper_x,
+    upper_y,
+    upper_z,
+    invalid_char,
+    invalid_char,
+    invalid_char,
+    invalid_char,
+    invalid_char,
+    invalid_char,
+    lower_a,
+    lower_b,
+    lower_c,
+    lower_d,
+    lower_e,
+    lower_f,
+    lower_g,
+    lower_h,
+    lower_i,
+    lower_j,
+    lower_k,
+    lower_l,
+    lower_m,
+    lower_n,
+    lower_o,
+    lower_p,
+    lower_q,
+    lower_r,
+    lower_s,
+    lower_t,
+    lower_u,
+    lower_v,
+    lower_w,
+    lower_x,
+    lower_y,
+    lower_z};
 
 
 // Booleans for key presses
@@ -414,6 +530,8 @@ public:
     char facingDirection = 'd';
     __int8 bAttkFrame = -1;
     unsigned __int8 atkFrames = (sizeof(playerStationaryUpBasicAttack) / sizeof(playerStationaryUpBasicAttack[0])) - 1;
+    unsigned __int8 mId = 0;
+    unsigned __int8 lvlUpStats[9];
 
     std::vector<std::chrono::nanoseconds> refreshTimes;
 
@@ -1133,7 +1251,7 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Level_Up_Overworld_Text_8);
     spriteData.emplace_back(Level_Up_Overworld_Text_9);
 
-    // Status Numbers
+    // Symbols and Fonts
     spriteData.emplace_back(Stat_Number_0);
     spriteData.emplace_back(Stat_Number_1);
     spriteData.emplace_back(Stat_Number_2);
@@ -1154,10 +1272,7 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(Yellow_Stat_Number_7);
     spriteData.emplace_back(Yellow_Stat_Number_8);
     spriteData.emplace_back(Yellow_Stat_Number_9);
-
     spriteData.emplace_back(Focused_Level_Up_Down_Arrow);
-
-    // Small UI Numbers
     spriteData.emplace_back(small_0);
     spriteData.emplace_back(small_1);
     spriteData.emplace_back(small_2);
@@ -1169,6 +1284,60 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(small_8);
     spriteData.emplace_back(small_9);
     spriteData.emplace_back(small_forwardslash);
+    spriteData.emplace_back(plus);
+    spriteData.emplace_back(upper_a);
+    spriteData.emplace_back(upper_b);
+    spriteData.emplace_back(upper_c);
+    spriteData.emplace_back(upper_d);
+    spriteData.emplace_back(upper_e);
+    spriteData.emplace_back(upper_f);
+    spriteData.emplace_back(upper_g);
+    spriteData.emplace_back(upper_h);
+    spriteData.emplace_back(upper_i);
+    spriteData.emplace_back(upper_j);
+    spriteData.emplace_back(upper_k);
+    spriteData.emplace_back(upper_l);
+    spriteData.emplace_back(upper_m);
+    spriteData.emplace_back(upper_n);
+    spriteData.emplace_back(upper_o);
+    spriteData.emplace_back(upper_p);
+    spriteData.emplace_back(upper_q);
+    spriteData.emplace_back(upper_r);
+    spriteData.emplace_back(upper_s);
+    spriteData.emplace_back(upper_t);
+    spriteData.emplace_back(upper_u);
+    spriteData.emplace_back(upper_v);
+    spriteData.emplace_back(upper_w);
+    spriteData.emplace_back(upper_x);
+    spriteData.emplace_back(upper_y);
+    spriteData.emplace_back(upper_z);
+    spriteData.emplace_back(lower_a);
+    spriteData.emplace_back(lower_b);
+    spriteData.emplace_back(lower_c);
+    spriteData.emplace_back(lower_d);
+    spriteData.emplace_back(lower_e);
+    spriteData.emplace_back(lower_f);
+    spriteData.emplace_back(lower_g);
+    spriteData.emplace_back(lower_h);
+    spriteData.emplace_back(lower_i);
+    spriteData.emplace_back(lower_j);
+    spriteData.emplace_back(lower_k);
+    spriteData.emplace_back(lower_l);
+    spriteData.emplace_back(lower_m);
+    spriteData.emplace_back(lower_n);
+    spriteData.emplace_back(lower_o);
+    spriteData.emplace_back(lower_p);
+    spriteData.emplace_back(lower_q);
+    spriteData.emplace_back(lower_r);
+    spriteData.emplace_back(lower_s);
+    spriteData.emplace_back(lower_t);
+    spriteData.emplace_back(lower_u);
+    spriteData.emplace_back(lower_v);
+    spriteData.emplace_back(lower_w);
+    spriteData.emplace_back(lower_x);
+    spriteData.emplace_back(lower_y);
+    spriteData.emplace_back(lower_z);
+    spriteData.emplace_back(invalid_char);
 
 
     //---------------- Environment -----------------//
@@ -1331,11 +1500,79 @@ void DiscardDeviceResources()
     }
 }
 
+void RenderStats(ID2D1Bitmap* stat1, ID2D1Bitmap* stat2, ID2D1Bitmap* stat3, int yOffset) {
+    int xOffset1, xOffset2, xOffset3;
+
+    if (stat1 && stat2 && stat3) 
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_SIZE_F size2 = stat2->GetSize();
+        D2D1_SIZE_F size3 = stat3->GetSize();
+        xOffset1 = 171 - size1.width - size2.width - size3.width;
+        xOffset2 = 172 - size2.width - size3.width;
+        xOffset3 = 173 - size3.width;
+    } 
+    else if (stat1 && stat2) 
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_SIZE_F size2 = stat2->GetSize();
+        xOffset1 = 172 - size1.width - size2.width;
+        xOffset2 = 173 - size2.width;
+    } 
+    else if (stat1) // if statement not necessary, but could prevent errors if stat were to somehow be emptied
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        xOffset1 = 173 - size1.width;
+    }
+
+    if (stat1)
+    {
+        D2D1_SIZE_F size1 = stat1->GetSize();
+        D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset1 * scalerX), yOffset * scalerY,
+            (leftBorder + ((xOffset1 + size1.width) * scalerX)), ((size1.height + yOffset) * scalerY));
+        pRenderTarget->DrawBitmap(stat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+        if (stat2)
+        {
+            D2D1_SIZE_F size2 = stat2->GetSize();
+            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset2 * scalerX), yOffset * scalerY,
+                (leftBorder + ((xOffset2 + size2.width) * scalerX)), ((size2.height + yOffset) * scalerY));
+            pRenderTarget->DrawBitmap(stat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+            if (stat3)
+            {
+                D2D1_SIZE_F size3 = stat3->GetSize();
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset3 * scalerX), yOffset * scalerY,
+                    (leftBorder + ((xOffset3 + size3.width) * scalerX)), ((size3.height + yOffset) * scalerY));
+                pRenderTarget->DrawBitmap(stat3, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+            }
+        }
+    }
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+std::vector<LPCWSTR> spriteData;
+Player player;
+Enemy leafEnemy[50];
+std::vector<Enemy> enemies;
+int startingStats[9];
+std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
+std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
+std::vector<Object> walls;
+std::vector<Environment> environments;
+unsigned __int8 currentEnvID(1);
+
+
+//--------------------------------
+// Render Consolidatory Functions
+//--------------------------------
+
 void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitmap2, ID2D1Bitmap*& bitmap3, bool selected) {
     std::string statString = std::to_string(stat);
 
 
-    if (!selected) 
+    if (!selected)
     {
         switch (statString[0])
         {
@@ -1566,68 +1803,34 @@ void TranslateStatstoBitmap(int stat, ID2D1Bitmap*& bitmap1, ID2D1Bitmap*& bitma
     }
 }
 
-void RenderStats(ID2D1Bitmap* stat1, ID2D1Bitmap* stat2, ID2D1Bitmap* stat3, int yOffset) {
-    int xOffset1, xOffset2, xOffset3;
-
-    if (stat1 && stat2 && stat3) 
-    {
-        D2D1_SIZE_F size1 = stat1->GetSize();
-        D2D1_SIZE_F size2 = stat2->GetSize();
-        D2D1_SIZE_F size3 = stat3->GetSize();
-        xOffset1 = 171 - size1.width - size2.width - size3.width;
-        xOffset2 = 172 - size2.width - size3.width;
-        xOffset3 = 173 - size3.width;
-    } 
-    else if (stat1 && stat2) 
-    {
-        D2D1_SIZE_F size1 = stat1->GetSize();
-        D2D1_SIZE_F size2 = stat2->GetSize();
-        xOffset1 = 172 - size1.width - size2.width;
-        xOffset2 = 173 - size2.width;
-    } 
-    else if (stat1) // if statement not necessary, but could prevent errors if stat were to somehow be emptied
-    {
-        D2D1_SIZE_F size1 = stat1->GetSize();
-        xOffset1 = 173 - size1.width;
-    }
-
-    if (stat1)
-    {
-        D2D1_SIZE_F size1 = stat1->GetSize();
-        D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset1 * scalerX), yOffset * scalerY,
-            (leftBorder + ((xOffset1 + size1.width) * scalerX)), ((size1.height + yOffset) * scalerY));
-        pRenderTarget->DrawBitmap(stat1, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-        if (stat2)
-        {
-            D2D1_SIZE_F size2 = stat2->GetSize();
-            D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset2 * scalerX), yOffset * scalerY,
-                (leftBorder + ((xOffset2 + size2.width) * scalerX)), ((size2.height + yOffset) * scalerY));
-            pRenderTarget->DrawBitmap(stat2, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-
-            if (stat3)
-            {
-                D2D1_SIZE_F size3 = stat3->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (xOffset3 * scalerX), yOffset * scalerY,
-                    (leftBorder + ((xOffset3 + size3.width) * scalerX)), ((size3.height + yOffset) * scalerY));
-                pRenderTarget->DrawBitmap(stat3, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-            }
+void RenderText(std::string text, unsigned __int8 x, unsigned __int8 y) {
+    __int8 spacerX(0), spacerY(0);
+    for (char c : text) {
+        unsigned __int8 i = unsigned __int8(c);
+        if (c == ' ') {
+            spacerX += 3;
+            continue;
         }
+        ID2D1Bitmap* symbol = pBitmaps[fontArray[i - 65]];
+        D2D1_SIZE_F size = symbol->GetSize();
+
+        if (c == 'p') {
+            spacerY = 3;
+        }
+        else {
+            spacerY = 9 - size.height;
+        }
+        D2D1_RECT_F destRect = D2D1::RectF(
+            ((x + spacerX) * scalerX) + leftBorder, 
+            (y + spacerY) * scalerY,
+            ((x + size.width + spacerX) * scalerX) + leftBorder, 
+            (y + size.height + spacerY) * scalerY);
+        pRenderTarget->DrawBitmap(symbol, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+        spacerX += (size.width + 1);
     }
+    return;
 }
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
-std::vector<LPCWSTR> spriteData;
-Player player;
-Enemy leafEnemy[50];
-std::vector<Enemy> enemies;
-int startingStats[9];
-std::chrono::steady_clock::time_point currentFrameTime = std::chrono::steady_clock::now(); // Keeps tracks of screen updates
-std::chrono::steady_clock::time_point debugTimer = std::chrono::steady_clock::now();
-std::vector<Object> walls;
-std::vector<Environment> environments;
-unsigned __int8 currentEnvID(1);
 
 void Render(HWND hWnd)
 {
@@ -1875,6 +2078,7 @@ void Render(HWND hWnd)
         }
 
 
+
         // If the player is in level up fanfare
         if (player.inLevelUpSequence == true || player.inLevelUpFanfare == true) {
 
@@ -1973,6 +2177,9 @@ void Render(HWND hWnd)
                     ((leftBorder + (64 * scalerX))) + (size.width * scalerX), ((size.height + 1) * scalerY));
                 pRenderTarget->DrawBitmap(shellBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
+
+
+            RenderText("Stump Sniffs Toes", 82, 6);
 
             int yArrowOffset;
 
@@ -2104,23 +2311,23 @@ void Render(HWND hWnd)
 
             // Get back button bitmap
             ID2D1Bitmap* backButtonBitmap;
-            LPCWSTR filename = player.lastBackButtonFile;
+            LPCWSTR filename = player.lastConfirmButtonFile;
             if (player.statSelection == 9 &&
                 (std::chrono::steady_clock::now() - player.backButtonAnimationInterval > std::chrono::milliseconds(500)))
             {
                 player.backButtonAnimationInterval = std::chrono::steady_clock::now();
-                if (player.lastBackButtonFile == Level_Up_Back_Button_Unpressed) {
-                    filename = Level_Up_Back_Button_Pressed;
-                    player.lastBackButtonFile = Level_Up_Back_Button_Pressed;
+                if (player.lastConfirmButtonFile == Level_Up_Confirm_Button_Unpressed) {
+                    filename = Level_Up_Confirm_Button_Pressed;
+                    player.lastConfirmButtonFile = Level_Up_Confirm_Button_Pressed;
                 }
                 else {
-                    filename = Level_Up_Back_Button_Unpressed;
-                    player.lastBackButtonFile = Level_Up_Back_Button_Unpressed;
+                    filename = Level_Up_Confirm_Button_Unpressed;
+                    player.lastConfirmButtonFile = Level_Up_Confirm_Button_Unpressed;
                 }
             }
             if (player.statSelection != 9) {
-                filename = Level_Up_Back_Button_Unpressed;
-                player.lastBackButtonFile = Level_Up_Back_Button_Unpressed;
+                filename = Level_Up_Confirm_Button_Unpressed;
+                player.lastConfirmButtonFile = Level_Up_Confirm_Button_Unpressed;
             }
 
             backButtonBitmap = pBitmaps[filename];
@@ -2130,23 +2337,10 @@ void Render(HWND hWnd)
             {
 
                 D2D1_SIZE_F size = backButtonBitmap->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (84 * scalerX), 207 * scalerY,
-                    ((leftBorder + (84 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
+                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (105 * scalerX), 207 * scalerY,
+                    ((leftBorder + (105 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
                 pRenderTarget->DrawBitmap(backButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
             }
-
-            // Get confirm button bitmap
-            ID2D1Bitmap* confirmButtonBitmap = pBitmaps[Level_Up_Confirm_Button_Unpressed];
-
-            // Render confirm button
-            if (confirmButtonBitmap)
-            {
-                D2D1_SIZE_F size = confirmButtonBitmap->GetSize();
-                D2D1_RECT_F destRect = D2D1::RectF(leftBorder + (135 * scalerX), 207 * scalerY,
-                    ((leftBorder + (135 * scalerX))) + (size.width * scalerX), ((size.height + 207) * scalerY));
-                pRenderTarget->DrawBitmap(confirmButtonBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
-            }
-
 
             //// Get confirm bitmap
             //ID2D1Bitmap* confirmButton = pBitmaps[Level_Up_Confirm_Button_Unpressed];
@@ -2206,99 +2400,43 @@ void Render(HWND hWnd)
     }
 }
 
-void UpdateGameLogic(double deltaSeconds) {
-    if (!player.inLevelUpSequence) {
-        player.UpdateHitBox();
-        for (auto door : environments.at(currentEnvID - 1).doors) {
-            if (player.CheckCollision(door)) {
-                currentEnvID = door.destID;
-                player.xPosition = door.destX;
-                player.yPosition = door.destY;
-                continue;
-            }
-        }
-        // Enemy Movement and Animations
-        for (int i = 0; i < enemies.size(); i++)
-        {
-            if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime) {
-                if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= enemies.at(i).moveInterval) {
-                    enemies.at(i).timeSinceLastMovement = std::chrono::steady_clock::now();
-                    enemies.at(i).xDirection = (rand() % 200) - 100;
-                    enemies.at(i).yDirection = (rand() % 200) - 100;
-                    enemies.at(i).xDirection /= 100;
-                    enemies.at(i).yDirection /= 100;
-                    enemies.at(i).moveInterval = std::chrono::milliseconds((rand() % 2000) + 1500);
-                }
-                ApplyEnemyDirectionalInput(enemies.at(i), 2 * enemies.at(i).xDirection * deltaSeconds, 2 * enemies.at(i).yDirection * deltaSeconds);
-            }
-            /*if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= std::chrono::seconds(5) && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
-            {
-                double leafXDir = ((rand() % 200)) - 100;
-                leafXDir /= 100;
-                double leafYDir = ((rand() % 200)) - 100;
-                leafYDir /= 100;
-                ApplyEnemyDirectionalInput(enemies.at(i), 2 * leafXDir * deltaSeconds, 2 * leafYDir * deltaSeconds);
-            }
-            else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
-            {
-                ApplyEnemyDirectionalInput(enemies.at(i), enemies.at(i).lastXDirection2 * deltaSeconds, enemies.at(i).lastYDirection2 * deltaSeconds);
-            }*/
-        }
-
-        // Player Actions, Movement, and Animations
-        double xDir, yDir;
-        if (keys.space == false && player.bAttkFrame == -1)
-        {
-            GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
-            if ((xDir != 0 || yDir != 0)) {
-                xDir *= 2.5;
-                yDir *= 2.5;
-                if (keys.lShift == true)
-                {
-                    xDir *= 1.4;
-                    yDir *= 1.4;
-                    player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
-                }
-                else
-                {
-                    player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
-                }
-                ApplyPlayerDirectionalInput(player, currentFrameTime, xDir * deltaSeconds, yDir * deltaSeconds);
-            }
-            else {
-                player.PlayerIdle();
-            }
-        }
 
 
-        else if ((keys.space == true && player.bAttkFrame == -1) || player.bAttkFrame != -1)
-        {
-            player.BasicAttack(enemies);
-        }
+//-----------------------------------------------
+// Consolidatory Functions for UpdateGameLogic()
+//-----------------------------------------------
 
-        if (player.exp >= player.levelup) {
-            player.PlayerLevelUpSequence();
+void HandleLevelUpSequence() {
+    if (player.inLevelUpFanfare) {
+        if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
+            player.inLevelUpFanfare = false;
         }
+        startingStats[0] = player.strength;
+        startingStats[1] = player.dexterity;
+        startingStats[2] = player.intelligence;
+        startingStats[3] = player.wisdom;
+        startingStats[4] = player.defense;
+        startingStats[5] = player.magicDefense;
+        startingStats[6] = player.trueDefense;
+        startingStats[7] = player.agility;
+        startingStats[8] = player.luck;
+
     }
     else
     {
-        if (player.inLevelUpFanfare) {
-            if ((std::chrono::steady_clock::now() - player.levelUpFanfareBegin) >= std::chrono::seconds(1)) {
-                player.inLevelUpFanfare = false;
-            }
-            startingStats[0] = player.strength;
-            startingStats[1] = player.dexterity;
-            startingStats[2] = player.intelligence;
-            startingStats[3] = player.wisdom;
-            startingStats[4] = player.defense;
-            startingStats[5] = player.magicDefense;
-            startingStats[6] = player.trueDefense;
-            startingStats[7] = player.agility;
-            startingStats[8] = player.luck;
+        if (player.mId == 9 && keys.space) {
 
+            std::discrete_distribution<int> range({ 7, 3, 1});
+            for (unsigned __int8 i = 0; i < sizeof(player.lvlUpStats); i++) {
+                player.lvlUpStats[i] = 1 + range(generator);
+            }
+            player.mId = 0;
+            player.inLevelUpSequence = false;
+            player.exp = 0;
+            player.levelup *= 1.10;
+            return;
         }
-        else
-        {
+        if (player.mId == 10) {
             if ((!player.statSelected && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(150)))
                 || ((keys.space && player.statSelected) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection >= std::chrono::milliseconds(300)))
                 || ((player.statSelected && !keys.space) && (std::chrono::steady_clock::now() - player.timeSinceLastStatSelection > std::chrono::milliseconds(150)))
@@ -2324,6 +2462,13 @@ void UpdateGameLogic(double deltaSeconds) {
                     }
                 }
                 if (keys.space) {
+                    if (player.statSelection == 9) {
+                        player.inLevelUpSequence = false;
+                        player.inLevelUpFanfare = false;
+                        player.exp = 0;
+                        player.levelup *= 1.10;
+                        return;
+                    }
                     player.timeSinceLastStatSelection = std::chrono::steady_clock::now();
                     if (player.statSelected == false) {
                         player.statSelected = true;
@@ -2416,6 +2561,87 @@ void UpdateGameLogic(double deltaSeconds) {
                 }
             }
         }
+    }
+}
+
+void UpdateGameLogic(double deltaSeconds) {
+    if (!player.inLevelUpSequence) {
+        player.UpdateHitBox();
+        for (auto door : environments.at(currentEnvID - 1).doors) {
+            if (player.CheckCollision(door)) {
+                currentEnvID = door.destID;
+                player.xPosition = door.destX;
+                player.yPosition = door.destY;
+                continue;
+            }
+        }
+        // Enemy Movement and Animations
+        for (int i = 0; i < enemies.size(); i++)
+        {
+            if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime) {
+                if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= enemies.at(i).moveInterval) {
+                    enemies.at(i).timeSinceLastMovement = std::chrono::steady_clock::now();
+                    enemies.at(i).xDirection = (rand() % 200) - 100;
+                    enemies.at(i).yDirection = (rand() % 200) - 100;
+                    enemies.at(i).xDirection /= 100;
+                    enemies.at(i).yDirection /= 100;
+                    enemies.at(i).moveInterval = std::chrono::milliseconds((rand() % 2000) + 1500);
+                }
+                ApplyEnemyDirectionalInput(enemies.at(i), 2 * enemies.at(i).xDirection * deltaSeconds, 2 * enemies.at(i).yDirection * deltaSeconds);
+            }
+            /*if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= std::chrono::seconds(5) && (std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+            {
+                double leafXDir = ((rand() % 200)) - 100;
+                leafXDir /= 100;
+                double leafYDir = ((rand() % 200)) - 100;
+                leafYDir /= 100;
+                ApplyEnemyDirectionalInput(enemies.at(i), 2 * leafXDir * deltaSeconds, 2 * leafYDir * deltaSeconds);
+            }
+            else if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime)
+            {
+                ApplyEnemyDirectionalInput(enemies.at(i), enemies.at(i).lastXDirection2 * deltaSeconds, enemies.at(i).lastYDirection2 * deltaSeconds);
+            }*/
+        }
+
+        // Player Actions, Movement, and Animations
+        double xDir, yDir;
+        if (keys.space == false && player.bAttkFrame == -1)
+        {
+            GetDirectionalInput(xDir, yDir, keys.right, keys.left, keys.down, keys.up);
+            if ((xDir != 0 || yDir != 0)) {
+                xDir *= 2.5;
+                yDir *= 2.5;
+                if (keys.lShift == true)
+                {
+                    xDir *= 1.4;
+                    yDir *= 1.4;
+                    player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
+                }
+                else
+                {
+                    player.walkAnimationInterval = std::chrono::nanoseconds(200000000);
+                }
+                ApplyPlayerDirectionalInput(player, currentFrameTime, xDir * deltaSeconds, yDir * deltaSeconds);
+            }
+            else {
+                player.PlayerIdle();
+            }
+        }
+
+
+        else if ((keys.space == true && player.bAttkFrame == -1) || player.bAttkFrame != -1)
+        {
+            player.BasicAttack(enemies);
+        }
+
+        if (player.exp >= player.levelup) {
+            player.mId = 9;
+            player.PlayerLevelUpSequence();
+        }
+    }
+    else
+    {
+        HandleLevelUpSequence();
     }
 }
 
