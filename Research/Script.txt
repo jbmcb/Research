@@ -1,0 +1,11 @@
+Prologue:
+- Gigantic dragon appears in horizon, gives short spill about fate, blasts player and screen
+- Player Wakes up, in house, dad's outside
+- Can't go down yet, sees dad in backyard, short tutorial on combat
+- Dad grimaces in pain, points out lack of potions, requests you to pick up more
+- Player enters forest area, ravaged mess, pathways are blocked, something feels weird
+- Wizard fight
+  > defeat the wizard, its dead body slumps to the ground instead of despawning and you get     the upgrade. You can be on you way if you want to or you can look around the area. There     are some old parchments in the area, and if you read them, you see him explaining what     happened to him. After reading it, your player automatically approaches the body, the game     clips to black for a second, then comes back to the player standing in front of a freshly     dug grave.
+- Use fireball upgrade to traverse obstacles
+- Fight big plant boss, get heal spell after defeating
+- Walk pathway to reach town
