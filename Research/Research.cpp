@@ -13,6 +13,8 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include <cmath>
+#include <d2d1helper.h>
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "windowscodecs.lib")
@@ -59,6 +61,8 @@ LPCWSTR player_Blocking_U = L"Sprites\\Player\\Player_Blocking_U.png";
 LPCWSTR player_Blocking_D = L"Sprites\\Player\\Player_Blocking_D.png";
 LPCWSTR player_Blocking_L = L"Sprites\\Player\\Player_Blocking_L.png";
 LPCWSTR player_Blocking_R = L"Sprites\\Player\\Player_Blocking_R.png";
+LPCWSTR player_shadow = L"Sprites\\Player\\Player_Shadow.png";
+LPCWSTR player_shadow_sideways = L"Sprites\\Player\\Player_Shadow_Sideways.png";
 
 // Weapon Sprites
 LPCWSTR testSwordBasicAttack[9];
@@ -91,6 +95,7 @@ LPCWSTR testBackground = L"Sprites\\Environment\\testBackground.png";
 LPCWSTR checkerBackground = L"Sprites\\Environment\\checkerBackground.png";
 LPCWSTR BG_home_f = L"Sprites\\Environment\\Home_Front.png";
 LPCWSTR BG_home_b = L"Sprites\\Environment\\Home_Back.png";
+LPCWSTR BG_home_roof = L"Sprites\\Environment\\Home_Back_Roof.png";
 LPCWSTR BG_home_p1 = L"Sprites\\Environment\\Home_Pathway_1.png";
 LPCWSTR BG_home_p2 = L"Sprites\\Environment\\Home_Pathway_2.png";
 LPCWSTR BG_home_interior_1 = L"Sprites\\Environment\\Home_Interior_1.png";
@@ -554,6 +559,8 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(player_Blocking_D);
     spriteData.emplace_back(player_Blocking_L);
     spriteData.emplace_back(player_Blocking_R);
+    spriteData.emplace_back(player_shadow);
+    spriteData.emplace_back(player_shadow_sideways);
 
 
     //---------------- Enemies -----------------//
@@ -705,6 +712,7 @@ void StoreSpriteFileNames(std::vector<LPCWSTR>& spriteData)
     spriteData.emplace_back(checkerBackground);
     spriteData.emplace_back(BG_home_f);
     spriteData.emplace_back(BG_home_b);
+    spriteData.emplace_back(BG_home_roof);
     spriteData.emplace_back(BG_home_p1);
     spriteData.emplace_back(BG_home_p2);
     spriteData.emplace_back(BG_home_interior_1);
@@ -821,6 +829,13 @@ struct
 // Used to cycle frames such as idle animations or effect shines
 //void GenericFrameCycler()
 
+D2D1_POINT_2F TransformPoint(const D2D1_MATRIX_3X2_F& m, const D2D1_POINT_2F& p)
+{
+    return D2D1::Point2F(
+        p.x * m._11 + p.y * m._21 + m._31,
+        p.x * m._12 + p.y * m._22 + m._32
+    );
+}
 
 void GetDirectionalInput(double& xDirection, double& yDirection, bool keyRight, bool keyLeft, bool keyDown, bool keyUp)
 {
@@ -919,8 +934,11 @@ public:
     LPCWSTR walkCycles[3];
     bool cycleUp = true;
     int walkIndex = 0;
+    std::chrono::milliseconds idleInterval;
+    std::chrono::steady_clock::time_point idlePoint;
+    bool moving;
 
-    Enemy(int id)
+    Enemy(int id, float xPos, float yPos)
     {
         LPCWSTR file = L"", walkF1 = L"", walkF2 = L"";
         switch (id) {
@@ -928,16 +946,19 @@ public:
             file = leafEnemyStationary;
             walkF1 = leafEnemyDownWalkingLeft;
             walkF2 = leafEnemyDownWalkingRight;
+            xpGiven = 15;
             break;
         case 1:
             file = cherryEnemyStationary;
             walkF1 = cherryEnemyDownWalkingLeft;
             walkF2 = cherryEnemyDownWalkingRight;
+            xpGiven = 23;
             break;
         case 2:
             file = hornetEnemy1;
             walkF1 = hornetEnemy1;
             walkF2 = hornetEnemy2;
+            xpGiven = 33;
             walkInterval = std::chrono::milliseconds(10);
             break;
         case 3:
@@ -945,8 +966,8 @@ public:
         case 4:
             break;
         }
-        xPosition = rand() % int(rightBorder - leftBorder) + leftBorder;
-        yPosition = rand() % sysScreenY;
+        xPosition = xPos + leftBorder;
+        yPosition = yPos;
         frame = file;
         lastfilepath = frame;
         secondlastfilepath = leafEnemyDownWalkingRight;
@@ -1076,6 +1097,9 @@ public:
     std::chrono::nanoseconds hitLag = std::chrono::nanoseconds(0);
     std::chrono::nanoseconds walkAnimationInterval = std::chrono::nanoseconds(166666666);
     std::chrono::steady_clock::time_point lastLevelUpOverworldTextTime;
+    std::chrono::steady_clock::time_point dmgLagStarted;
+    std::chrono::nanoseconds dmgLagDur = std::chrono::nanoseconds(166666666);
+                                                                   
 
 
     bool isBasicAttacking = false;
@@ -1468,8 +1492,10 @@ public:
                 if (pBitmap)
                 {
                     D2D1_SIZE_F size = pBitmap->GetSize();
+                    float yOffset(0);
+                    if (angleDegrees == 180.0) yOffset = -4;
                     weaponXPosition = xPosition + ((size.width * wpnXOff[bAttkFrame]) * scalerX);
-                    weaponYPosition = yPosition + ((size.height * wpnYOff[bAttkFrame]) * scalerY);
+                    weaponYPosition = yPosition + ((yOffset + (size.height * wpnYOff[bAttkFrame])) * scalerY);
                 }
 
                 SetHitBox();
@@ -1514,16 +1540,17 @@ public:
                     if (hitbox.right >= enemies.at(i).hurtbox.left && hitbox.left <= enemies.at(i).hurtbox.right
                         && hitbox.top <= enemies.at(i).hurtbox.bottom && hitbox.bottom >= enemies.at(i).hurtbox.top)
                     {
+                        dmgLagStarted = std::chrono::steady_clock::now();
                         /*enemies.at(i).damageTaken = true;*/
                         enemies.at(i).alreadyHit = true;
                         enemies.at(i).inHitstun = true;
-                        enemies.at(i).hp -= 10;
+                        enemies.at(i).hp -= strength;
                         /*double nanoseconds = (static_cast<double>(attack) / static_cast<double>(enemies.at(i).maxHP)) * 333333333;
                         hitLag = std::chrono::nanoseconds((static_cast<int>(nanoseconds)));*/
 
                         if (enemies.at(i).hp <= 0)
                         {
-                            exp += 100;
+                            exp += enemies.at(i).xpGiven;
                             enemies.erase(enemies.begin() + i);
                         }
                         else
@@ -1545,13 +1572,43 @@ public:
 
     void SetHitBox()
     {
+        ID2D1Bitmap* playerFrame = memSprites[frame];
+        D2D1_SIZE_F playerSize = playerFrame->GetSize();
+        D2D1_POINT_2F midpoint = D2D1::Point2F(
+            xPosition + ((playerSize.width * scalerX) / 2),
+            yPosition + ((playerSize.height * scalerY) / 2)
+        );
+
         ID2D1Bitmap* pBitmap = memSprites[weaponFileName];
-        if (pBitmap)
-        {
-            D2D1_SIZE_F size = pBitmap->GetSize();
-            hitbox = D2D1::RectF(weaponXPosition, weaponYPosition,
-                (size.width * scalerX) + weaponXPosition, (size.height * scalerY) + weaponYPosition);
-        }
+        if (!pBitmap)
+            return;
+
+        D2D1_SIZE_F size = pBitmap->GetSize();
+
+        float width = size.width * scalerX;
+        float height = size.height * scalerY;
+
+        D2D1_RECT_F baseRect = D2D1::RectF(
+            weaponXPosition,
+            weaponYPosition,
+            weaponXPosition + width,
+            weaponYPosition + height
+        );
+
+        D2D1_MATRIX_3X2_F rotation =
+            D2D1::Matrix3x2F::Rotation(angleDegrees, midpoint);
+
+        D2D1_POINT_2F p1 = TransformPoint(rotation, D2D1::Point2F(baseRect.left, baseRect.top));
+        D2D1_POINT_2F p2 = TransformPoint(rotation, D2D1::Point2F(baseRect.right, baseRect.top));
+        D2D1_POINT_2F p3 = TransformPoint(rotation, D2D1::Point2F(baseRect.right, baseRect.bottom));
+        D2D1_POINT_2F p4 = TransformPoint(rotation, D2D1::Point2F(baseRect.left, baseRect.bottom));
+
+        float minX = min(min(p1.x, p2.x), min(p3.x, p4.x));
+        float maxX = max(max(p1.x, p2.x), max(p3.x, p4.x));
+        float minY = min(min(p1.y, p2.y), min(p3.y, p4.y));
+        float maxY = max(max(p1.y, p2.y), max(p3.y, p4.y));
+
+        hitbox = D2D1::RectF(minX, minY, maxX, maxY);
     }
 
     void RemoveHitBox()
@@ -1630,6 +1687,21 @@ public:
     unsigned __int8 id;
     LPCWSTR frame;
     std::vector<Door> doors;
+    std::vector<Object> props;
+    class EnemyData {
+    public:
+        int enemyID;
+        float sPosX, sPosY;
+        bool deathStatus, spawned;
+        EnemyData(int id, float posX, float posY, bool d) {
+            enemyID = id;
+            sPosX = posX;
+            sPosY = posY;
+            deathStatus = d;
+            spawned = false;
+        }
+    };
+    std::vector<EnemyData> enemyData;
 
     Environment(LPCWSTR file, unsigned __int8 ident) {
         frame = file;
@@ -1638,6 +1710,13 @@ public:
 
     void AddDoor(unsigned __int8 l, unsigned __int8 r, unsigned __int8 u, unsigned __int8 d, float toX, float toY, unsigned __int8 toID) {
         doors.emplace_back(l, r, u, d, toX, toY, toID);
+    }
+
+    void AddProp(LPCWSTR file, float x, float y) {
+        props.emplace_back();
+        props.back().xPosition = leftBorder + (x * scalerX);
+        props.back().yPosition = (y * scalerY);
+        props.back().frame = file;
     }
 };
 
@@ -1686,7 +1765,7 @@ public:
 
 void ApplyPlayerDirectionalInput(Player& player, std::chrono::steady_clock::time_point currentFrameTime, double xDir, double yDir)
 {
-        player.MovePlayer(xDir * 4, yDir * 4);
+        player.MovePlayer(xDir, yDir);
         if ((player.hurtbox.left >= leftBorder && player.hurtbox.top >= 0
             && player.hurtbox.right <= rightBorder && player.hurtbox.bottom <= sysScreenY) 
             || ((player.hurtbox.left <= leftBorder || player.hurtbox.right >= rightBorder) && yDir != 0)
@@ -2678,7 +2757,10 @@ void Render(HWND hWnd)
         renderTarget->PushAxisAlignedClip(aspectEnforcer, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
         HRESULT hr = S_OK;
         if (gameState != 99) {
-            RenderObjLeft(environments.at(currentEnvID - 1).frame, leftBorder, 0); // Render Background
+            // Render Environment
+            RenderObjLeft(environments.at(currentEnvID - 1).frame, leftBorder, 0); 
+            
+            // Render Enemies
             for (int i = 0; i < enemies.size(); i++)
             {
                 RenderObjLeft(enemies[i].frame, enemies[i].xPosition, enemies[i].yPosition);
@@ -2693,18 +2775,18 @@ void Render(HWND hWnd)
                     file_Name = playerHurtBox;
                 }
 
-                //ID2D1Bitmap* enemyHurtBoxBitmap = memSprites[file_Name];
+                ID2D1Bitmap* enemyHurtBoxBitmap = memSprites[file_Name];
 
-                //// Draw the hurtboxbitmap
-                //if (enemyHurtBoxBitmap)
-                //{
-                //    D2D1_SIZE_F size;
-                //    size.width = enemies.at(i).hurtbox.right - enemies.at(i).hurtbox.left;
-                //    size.height = enemies.at(i).hurtbox.bottom - enemies.at(i).hurtbox.top;
-                //    D2D1_RECT_F destRect = D2D1::RectF(enemies.at(i).hurtbox.left, enemies.at(i).hurtbox.top,
-                //        size.width + enemies.at(i).hurtbox.left, size.height + enemies.at(i).hurtbox.top);
-                //    renderTarget->DrawBitmap(enemyHurtBoxBitmap, destRect);
-                //}
+                // Draw the hurtboxbitmap
+                /*if (enemyHurtBoxBitmap)
+                {
+                    D2D1_SIZE_F size;
+                    size.width = enemies.at(i).hurtbox.right - enemies.at(i).hurtbox.left;
+                    size.height = enemies.at(i).hurtbox.bottom - enemies.at(i).hurtbox.top;
+                    D2D1_RECT_F destRect = D2D1::RectF(enemies.at(i).hurtbox.left, enemies.at(i).hurtbox.top,
+                        size.width + enemies.at(i).hurtbox.left, size.height + enemies.at(i).hurtbox.top);
+                    renderTarget->DrawBitmap(enemyHurtBoxBitmap, destRect);
+                }*/
             } 
 
             // Get weapon bitmap
@@ -2716,7 +2798,20 @@ void Render(HWND hWnd)
             // Render weapon
             if (playerWeaponFrameBitmap)
             {
+                ID2D1Bitmap* hitbox = memSprites[playerHitBox];
 
+                // Draw the hurtboxbitmap
+                /*if (hitbox)
+                {
+                    D2D1_SIZE_F size;
+                    size.width = player.hitbox.right - player.hitbox.left;
+                    size.height = player.hitbox.bottom - player.hitbox.top;
+                    D2D1_RECT_F destRect = D2D1::RectF(player.hitbox.left, player.hitbox.top,
+                        size.width + player.hitbox.left, size.height + player.hitbox.top);
+                    renderTarget->DrawBitmap(hitbox, destRect);
+                }*/
+
+                // Draw Weapon
                 D2D1_SIZE_F size = playerWeaponFrameBitmap->GetSize();
                 D2D1_SIZE_F playerSize = playerFrameBitmap->GetSize();
                 D2D1_POINT_2F midpoint = D2D1::Point2F((player.xPosition + ((playerSize.width * scalerX) / 2)), (player.yPosition + (playerSize.height * scalerY) / 2));
@@ -2726,18 +2821,7 @@ void Render(HWND hWnd)
                     (size.width * scalerX) + player.weaponXPosition, (size.height * scalerY) + player.weaponYPosition);
                 renderTarget->DrawBitmap(playerWeaponFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
-                ID2D1Bitmap* hitbox = memSprites[playerHitBox];
-
-                // Draw the hurtboxbitmap
-                if (hitbox)
-                {
-                    D2D1_SIZE_F size;
-                    size.width = player.hitbox.right - player.hitbox.left;
-                    size.height = player.hitbox.bottom - player.hitbox.top;
-                    D2D1_RECT_F destRect = D2D1::RectF(player.hitbox.left, player.hitbox.top,
-                        size.width + player.hitbox.left, size.height + player.hitbox.top);
-                    renderTarget->DrawBitmap(hitbox, destRect);
-                }
+                
 
                 renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
             }
@@ -2756,15 +2840,34 @@ void Render(HWND hWnd)
             // Render player
             if (playerFrameBitmap)
             {
+                int xOffset(2), yOffset(18);
+                ID2D1Bitmap* pShadow = memSprites[player_shadow];
+                if (player.angleDegrees == 90.0) {
+                    pShadow = memSprites[player_shadow_sideways];
+                }
+                else if (player.angleDegrees == 270.0) {
+                    pShadow = memSprites[player_shadow_sideways];
+                    xOffset = 3;
+                }
+                if (pShadow) {
+                    D2D1_SIZE_F size = pShadow->GetSize();
+                    D2D1_RECT_F destRect = D2D1::RectF(player.xPosition + (xOffset * scalerX), player.yPosition + (18 * scalerY),
+                        ((xOffset + size.width) * scalerX) + player.xPosition, ((18 + size.height) * scalerY) + player.yPosition);
+                    renderTarget->DrawBitmap(pShadow, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+                }
+
                 D2D1_SIZE_F size = playerFrameBitmap->GetSize();
                 D2D1_RECT_F destRect = D2D1::RectF(player.xPosition, player.yPosition,
                     (size.width * scalerX) + player.xPosition, (size.height * scalerY) + player.yPosition);
                 renderTarget->DrawBitmap(playerFrameBitmap, destRect, 1.0F, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+
+                
             }
 
             // Get hurtbox bitmap
             ID2D1Bitmap* playerHurtBoxBitmap = memSprites[playerHurtBox];
 
+            /*
             // Render hurtbox
             if (playerHurtBoxBitmap)
             {
@@ -2774,7 +2877,7 @@ void Render(HWND hWnd)
                 D2D1_RECT_F destRect = D2D1::RectF(player.hurtbox.left, player.hurtbox.top,
                 size.width + player.hurtbox.left, size.height + player.hurtbox.top);
                 renderTarget->DrawBitmap(playerHurtBoxBitmap, destRect);
-            }
+            }*/
 
             // Text format for MP & HP
             hr = DWriteCreateFactory(
@@ -2880,6 +2983,10 @@ void Render(HWND hWnd)
 
             // Skill Panes
             RenderObjLeft(skillPanes, leftBorder + (2 * scalerX), (2 * scalerX));
+
+            for (auto prop : environments.at(currentEnvID - 1).props) {
+                RenderObjLeft(prop.frame, prop.xPosition, prop.yPosition);
+            }
 
             // FPS Counter
             hr = DWriteCreateFactory(
@@ -3204,13 +3311,13 @@ void Render(HWND hWnd)
 
 void InitializeAssets() {
     std::discrete_distribution<int> range({ 7, 3, 1 });
-    player.strength = 7 + range(generator);
-    player.agility = 7 + range(generator);
-    player.intelligence = 7 + range(generator);
-    player.wisdom = 7 + range(generator);
-    player.defense = 7 + range(generator);
-    player.magicDefense = 7 + range(generator);
-    player.luck = 7 + range(generator);
+    player.strength = 3 + range(generator);
+    player.agility = 3 + range(generator);
+    player.intelligence = 3 + range(generator);
+    player.wisdom = 3 + range(generator);
+    player.defense = 3 + range(generator);
+    player.magicDefense = 3 + range(generator);
+    player.luck = 3 + range(generator);
 
 
     playerStationaryUpBasicAttackFrames[0] = L"Sprites\\Player\\playerstationaryupbasicattack0.png";
@@ -3250,6 +3357,7 @@ void InitializeAssets() {
     environments.emplace_back(BG_home_b, environments.size() + 1);
     environments.back().AddDoor(40, 104, 223, 224, -1, 1, 1);
     environments.back().AddDoor(168, 186, 185, 186, 120.5, 21, 5);
+    environments.back().AddProp(BG_home_roof, 104, 171);
 
     // 3: Home Path 1
     environments.emplace_back(BG_home_p1, environments.size() + 1);
@@ -3270,17 +3378,19 @@ void InitializeAssets() {
     environments.emplace_back(Forest_1, environments.size() + 1);
     environments.back().AddDoor(111, 145, 0, 1, 164, 202, 4);
     environments.back().AddDoor(105, 145, 223, 224, -1, 1, 7);
-    environments.back().AddDoor(0, 1, 97, 135, 242, -1, 10);
+    environments.back().AddDoor(0, 1, 97, 135, 241, -1, 10);
+    environments.at(environments.size() - 1).enemyData.emplace_back(0, 74, 34, false);
+    environments.at(environments.size() - 1).enemyData.emplace_back(0, 44, 170, false);
 
     // 7: Forest 2
     environments.emplace_back(Forest_2, environments.size() + 1);
     environments.back().AddDoor(107, 147, 0, 1, -1, 202, 6);
-    environments.back().AddDoor(254, 255, 105, 156, 0, -1, 8);
-    environments.back().AddDoor(0, 1, 102, 149, 242, -1, 11);
+    environments.back().AddDoor(254, 255, 105, 156, 1, -1, 8);
+    environments.back().AddDoor(0, 1, 102, 149, 241, -1, 11);
 
     // 8: Forest 3
     environments.emplace_back(Forest_4, environments.size() + 1);
-    environments.back().AddDoor(0, 1, 105, 156, 242, -1, 7);
+    environments.back().AddDoor(0, 1, 105, 156, 241, -1, 7);
     environments.back().AddDoor(112, 168, 0, 1, -1, 202, 9);
 
     // 9: Forest 4
@@ -3289,11 +3399,11 @@ void InitializeAssets() {
 
     // 10: Forest 5
     environments.emplace_back(Forest_3, environments.size() + 1);
-    environments.back().AddDoor(254, 255, 87, 138, 0, -1, 6);
+    environments.back().AddDoor(254, 255, 87, 138, 1, -1, 6);
 
     // 11: Forest 6
     environments.emplace_back(Forest_6, environments.size() + 1);
-    environments.back().AddDoor(254, 255, 102, 148, 0, -1, 7);
+    environments.back().AddDoor(254, 255, 102, 148, 1, -1, 7);
     environments.back().AddDoor(91, 134, 223, 224, -1, 1, 12);
 
     // 12: Forest 7
@@ -3308,7 +3418,7 @@ void InitializeAssets() {
 
     // 14: Forest 9
     environments.emplace_back(Forest_9, environments.size() + 1);
-    environments.back().AddDoor(0, 1, 112, 199, 242, -1, 13);
+    environments.back().AddDoor(0, 1, 112, 199, 241, -1, 13);
     environments.back().AddDoor(254, 255, 117, 199, 1, -1, 15);
     environments.back().AddDoor(98, 143, 0, 1, -1, 202, 16);
     environments.back().AddDoor(80, 161, 223, 224, -1, 1, 17);
@@ -3335,15 +3445,6 @@ void InitializeAssets() {
     environments.emplace_back(Demo_End_Screen, environments.size() + 1);
 
     std::vector<bool> calendar(365, false);
-
-    enemies.reserve(50);
-    for (int i = 0; i < 7; i++)
-    {
-        std::uniform_int_distribution<int> range(0, 2);
-        int roll = range(generator);
-        enemies.emplace_back(roll);
-        enemies.back().xpGiven = 10;
-    }
 
     lastUpdate = std::chrono::steady_clock::now();
 
@@ -3389,8 +3490,8 @@ void HandleLevelUpSequence() {
 
             player.mId = 0;
             player.inLevelUpSequence = false;
-            player.exp = 0;
-            player.levelup *= 1.10;
+            player.exp = player.exp - player.levelup;
+            player.levelup *= 1.33;
             player.statsUpdated = false;
             return;
         }
@@ -3529,10 +3630,21 @@ void UpdateProjectileLogic(double deltaSeconds) {
         playerProjectiles.at(i).UpdateHitBox();
         for (int j = 0; j < enemies.size(); j++) {
             if (playerProjectiles.at(i).CheckCollision(enemies.at(j))) {
+                player.dmgLagStarted = std::chrono::steady_clock::now();
+                enemies.at(j).alreadyHit = true;
+                enemies.at(j).inHitstun = true;
                 enemies.at(j).hp -= playerProjectiles.at(i).power;
-                if (enemies.at(j).hp <= 0) {
+
+                if (enemies.at(j).hp <= 0)
+                {
                     player.exp += enemies.at(j).xpGiven;
                     enemies.erase(enemies.begin() + j);
+                }
+                else
+                {
+                    double nanoseconds = (static_cast<double>(playerProjectiles.at(i).power) / static_cast<double>(enemies.at(j).maxHP)) * 333333333;
+                    std::chrono::nanoseconds time = std::chrono::nanoseconds((static_cast<int>(nanoseconds)));
+                    enemies.at(j).EnemyHitstunAnimation(time);
                 }
                 playerProjectiles.erase(playerProjectiles.begin() + i);
                 i--;
@@ -3610,8 +3722,8 @@ void UpdatePlayerLogic(double deltaSeconds) {
             yDir *= 2.5;
             if (keys.lShift == true)
             {
-                xDir *= 1.4;
-                yDir *= 1.4;
+                xDir *= 1.8;
+                yDir *= 1.8;
                 player.walkAnimationInterval = std::chrono::nanoseconds(142857142);
             }
             else
@@ -3649,6 +3761,7 @@ void UpdatePlayerLogic(double deltaSeconds) {
 void UpdateGameLogic(double deltaSeconds)  {
     if (gameState == 0) {
         if (!player.inLevelUpSequence) {
+            if (std::chrono::steady_clock::now() - player.dmgLagStarted < player.dmgLagDur) return;
             player.UpdateHitBox();
 
             player.MP = min(player.maxMP, player.MP += (0.030 * deltaSeconds));
@@ -3656,6 +3769,11 @@ void UpdateGameLogic(double deltaSeconds)  {
             // Env Logic
             for (auto door : environments.at(currentEnvID - 1).doors) {
                 if (player.CheckCollision(door)) {
+                    for (int i = 0; i < environments.at(currentEnvID - 1).enemyData.size(); i++) {
+                        environments.at(currentEnvID - 1).enemyData[i].spawned = false;
+                    }
+                    enemies.clear();
+                    enemies.shrink_to_fit();
                     if (door.destID == 19) {
                         gameState = 1;
                         return;
@@ -3667,6 +3785,21 @@ void UpdateGameLogic(double deltaSeconds)  {
                 }
             }
             // Enemy Logic
+            if (environments.at(currentEnvID - 1).enemyData.size() > 0) {
+                for (int i = 0; i < environments.at(currentEnvID - 1).enemyData.size(); i++) {
+                    if (environments.at(currentEnvID - 1).enemyData[i].deathStatus == false && environments.at(currentEnvID - 1).enemyData[i].spawned == false) {
+                        float x = environments.at(currentEnvID - 1).enemyData[i].sPosX;
+                        float y = environments.at(currentEnvID - 1).enemyData[i].sPosY;
+                        enemies.emplace_back(environments.at(currentEnvID - 1).enemyData[i].enemyID, x * scalerX, y * scalerY);
+                        std::uniform_int_distribution<int> movingOdds(false, true);
+                        enemies.back().moving = movingOdds(generator);
+                        std::uniform_real_distribution<float> interval(1.0, 3.0);
+                        enemies.back().idleInterval = std::chrono::milliseconds(int(1000 * interval(generator)));
+                        enemies.back().idlePoint = std::chrono::steady_clock::now();
+                        environments.at(currentEnvID - 1).enemyData[i].spawned = true;
+                    }
+                }
+            }
             for (int i = 0; i < enemies.size(); i++)
             {
                 enemies.at(i).UpdateHitBox();
@@ -3679,14 +3812,23 @@ void UpdateGameLogic(double deltaSeconds)  {
                     player.HP -= (10 * mod);
 
                 }
+                std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+                if (now - enemies.at(i).idlePoint >= enemies.at(i).idleInterval) {
+                    enemies.at(i).idlePoint = std::chrono::steady_clock::now();
+                    enemies.at(i).moving ^= true;
+                }
+                if (enemies.at(i).moving == false) {
+                    enemies.at(i).frame = enemies.at(i).walkCycles[1];
+                    continue;
+                }
                 if ((std::chrono::steady_clock::now() - enemies.at(i).hitStunStartTime) >= enemies.at(i).hitStunTime) {
                     if ((std::chrono::steady_clock::now() - enemies.at(i).timeSinceLastMovement) >= enemies.at(i).moveInterval) {
                         enemies.at(i).timeSinceLastMovement = std::chrono::steady_clock::now();
-                        enemies.at(i).xDirection = (rand() % 200) - 100;
-                        enemies.at(i).yDirection = (rand() % 200) - 100;
+                        enemies.at(i).xDirection = (rand() % 100);
+                        enemies.at(i).yDirection = (rand() % 100);
                         enemies.at(i).xDirection /= 100;
                         enemies.at(i).yDirection /= 100;
-                        enemies.at(i).moveInterval = std::chrono::milliseconds((rand() % 2000) + 1500);
+                        enemies.at(i).moveInterval = std::chrono::milliseconds(rand() % 1500);
                     }
                     ApplyEnemyDirectionalInput(enemies.at(i), 2 * enemies.at(i).xDirection * deltaSeconds, 2 * enemies.at(i).yDirection * deltaSeconds);
                 }
